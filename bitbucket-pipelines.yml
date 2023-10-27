@@ -1,0 +1,54 @@
+definitions:
+  steps:
+    - step: &coverage-step
+        name: SonarQube analysis
+        image: node:16.17.0
+        script:
+          - npm install --quiet
+          - pipe: sonarsource/sonarqube-scan:1.2.0
+            variables:
+              SONAR_HOST_URL: ${SONAR_HOST_URL}
+              SONAR_TOKEN: ${SONAR_TOKEN}
+  caches:
+    sonar: ~/.sonar
+
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: Build on pull request (**)
+          image: node:16.17.0
+          size: 2x
+          memory: 4096
+          script:
+            - npm i
+            - npm run build
+    feature/*:
+      - step:
+          name: Build on pull request (feature/*)
+          image: node:16.17.0
+          size: 2x
+          memory: 4096
+          script:
+            - npm i
+            - npm run build
+  branches:
+    develop:
+      - step: *coverage-step
+      - step:
+          name: Build for Development
+          image: node:14.18.2
+          size: 2x
+          memory: 4096
+          script:
+            - npm i
+            - npm run build
+    master:
+      - step:
+          name: Build for Production
+          image: node:14.18.2
+          size: 2x
+          memory: 4096
+          script:
+            - npm i
+            - npm run build
