@@ -2,7 +2,7 @@ import { GenerateId } from 'App/Shared/Helpers/generate-id.helpers';
 import { Jackpot, RoundEntity } from './round.entity';
 
 export class Round implements RoundEntity {
-    public result: number;
+    public result: number | null;
     public open: boolean;
     public start_date: Date;
     public end_date?: Date;
@@ -13,7 +13,7 @@ export class Round implements RoundEntity {
     public uuid: string;
 
     constructor(round: RoundEntity) {
-        this.result = round.result;
+        this.result = null;
         this.open = true;
         this.start_date = round.start_date;
         this.end_date = round.end_date;

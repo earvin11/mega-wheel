@@ -1,5 +1,5 @@
 export interface RoundEntity {
-    result: number;
+    result?: number | null;
     open?: boolean;
     start_date: Date;
     end_date?: Date;
