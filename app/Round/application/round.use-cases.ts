@@ -1,4 +1,4 @@
-import { Round, RoundEntity, RoundRepository } from '../domain';
+import { Jackpot, Round, RoundEntity, RoundRepository } from '../domain';
 
 export class RoundUseCases {
     constructor(
@@ -39,6 +39,24 @@ export class RoundUseCases {
         } catch (error) {
             throw error;
         };
+    };
+
+    public closeBetsIndRound = async (uuid: string) => {
+        try {
+            const round = await this.roundRepository.closeBetsInRound(uuid);
+            return round;
+        } catch (error) {
+            throw error;
+        };
+    };
+
+    public setJackpotInRound = async (uuid: string, jackpotValue: Jackpot) => {
+        try {
+            const round = await this.roundRepository.setJackpotInRound(uuid, jackpotValue);
+            return round;
+        } catch (error) {
+            throw error;
+        }
     };
 
     public colseRound = async (uuid: string, result: number) => {

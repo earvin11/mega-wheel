@@ -1,4 +1,4 @@
-import { RoundEntity, RoundRepository } from '../domain';
+import { Jackpot, RoundEntity, RoundRepository } from '../domain';
 import RoundModel from './round.model';
 
 export class RoundMongoRepository implements RoundRepository {
@@ -31,6 +31,22 @@ export class RoundMongoRepository implements RoundRepository {
         try {
             const rounds = await RoundModel.find({ providerId });
             return rounds;
+        } catch (error) {
+            throw error;
+        }
+    }
+    public closeBetsInRound = async (uuid: string): Promise<RoundEntity | null> => {
+        try {
+            const roundBetsClosed = await RoundModel.findOneAndUpdate({ uuid }, { open: false }, { new: true });
+            return roundBetsClosed;
+        } catch (error) {
+            throw error;
+        }
+    }
+    public setJackpotInRound = async (uuid: string, jackpotValue: Jackpot): Promise<RoundEntity | null> => {
+        try {
+            const roundWithJackpot = await RoundModel.findOneAndUpdate({ uuid }, { jackpot: jackpotValue }, { new: true });
+            return roundWithJackpot;
         } catch (error) {
             throw error;
         }
