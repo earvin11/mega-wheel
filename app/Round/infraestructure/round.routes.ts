@@ -5,6 +5,8 @@ const RoundRoutes = () => {
   Route.post('/', roundController.createRound).middleware([
     // 'validateToken',
   ]);
+
+  Route.patch('/result', roundController.result)
 };
 
 export default RoundRoutes;
