@@ -8,8 +8,14 @@
 |
 */
 import Redis from '@ioc:Adonis/Addons/Redis'
+import { END_GAME_PUB_SUB, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
+import Logger from '@ioc:Adonis/Core/Logger'
 
-Redis.subscribe('user:signup', (user: string) => {
-  console.log(JSON.parse(user))
+Redis.subscribe(START_GAME_PUB_SUB, async () => {
+  Logger.info('INICIAR MEGA WHEEL')
+})
+
+Redis.subscribe(END_GAME_PUB_SUB, async () => {
+  Logger.info('FIN DE JUEGO')
 })
 
