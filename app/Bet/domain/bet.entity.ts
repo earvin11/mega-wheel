@@ -5,6 +5,8 @@ export interface BetEntity {
     playerUuid: string;
     roundUuid: string;
     isPaid: boolean;
+    totalAmount: number;
+    currencyUuid: string;
 };
 
 export interface BetBody {

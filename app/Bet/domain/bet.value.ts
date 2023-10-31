@@ -8,6 +8,8 @@ export class Bet implements BetEntity {
     public playerUuid: string;
     public roundUuid: string;
     public isPaid: boolean;
+    public totalAmount: number;
+    public currencyUuid: string;
 
     constructor(bet: BetEntity) {
         this.bet = bet.bet;
@@ -16,5 +18,7 @@ export class Bet implements BetEntity {
         this.playerUuid = bet.playerUuid;
         this.roundUuid = bet.roundUuid;
         this.isPaid = false;
+        this.totalAmount = bet.totalAmount;
+        this.currencyUuid =  bet.currencyUuid;
     };
 };
