@@ -8,7 +8,7 @@
 |
 */
 import Redis from '@ioc:Adonis/Addons/Redis'
-import { END_GAME_PUB_SUB, START_GAME_PUB_SUB } from 'App/Game/infrastructure/contants'
+import { END_GAME_PUB_SUB, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
 import Logger from '@ioc:Adonis/Core/Logger'
 
 Redis.subscribe(START_GAME_PUB_SUB, async () => {

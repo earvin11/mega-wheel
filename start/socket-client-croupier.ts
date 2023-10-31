@@ -1,1 +1,1 @@
-import 'App/Game/infrastructure/croupier.socket'
+import 'App/WheelFortune/infraestructure/croupier.socket'
