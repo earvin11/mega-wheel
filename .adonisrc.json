@@ -14,12 +14,14 @@
   },
   "preloads": [
     "./start/routes",
-    "./start/kernel"
+    "./start/kernel",
+    "./start/redis"
   ],
   "providers": [
     "./providers/AppProvider",
     "@adonisjs/core",
-    "./providers/MongooseProvider"
+    "./providers/MongooseProvider",
+    "@adonisjs/redis"
   ],
   "aceProviders": [
     "@adonisjs/repl"
