@@ -1,5 +1,8 @@
 import { Server } from 'socket.io'
 import AdonisServer from '@ioc:Adonis/Core/Server'
+import Logger from '@ioc:Adonis/Core/Logger'
+
+// TODO: Delete this file if we are not going to use it
 
 class SocketServer {
   public io: Server
@@ -13,7 +16,7 @@ class SocketServer {
       return
     }
 
-    console.log('SOCKET SERVER CONNECT')
+    Logger.info('SOCKET SERVER CONNECT - OLD VERSION')
     this.booted = true
     this.io = new Server(AdonisServer.instance, {
       transports: ['websocket'],

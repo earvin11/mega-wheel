@@ -11,8 +11,9 @@ import Redis from '@ioc:Adonis/Addons/Redis'
 import { END_GAME_PUB_SUB, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
 import Logger from '@ioc:Adonis/Core/Logger'
 import { roundUseCases } from 'App/Round/infraestructure/dependencies';
-import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies';
+import { wheelFortuneController, wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies';
 import { sleep } from 'App/Shared/Helpers/sleep';
+import { socketServerGame } from 'App/Shared/Services/socket-server-game';
 
 Redis.subscribe(START_GAME_PUB_SUB, async () => {
   Logger.info('INICIAR MEGA WHEEL');
@@ -20,6 +21,8 @@ Redis.subscribe(START_GAME_PUB_SUB, async () => {
   // ABRIR JUEGO
   // CONTROLLER START
   const round = await roundUseCases.createRound({ gameUuid: 'asdas', identifierNumber: '1-1', providerId: 'm1', start_date: new Date() })
+
+  wheelFortuneController.changePhase('m1', 'initial_bet', socketServerGame.io)
 
   Redis.set(`round:${round.uuid}`, JSON.stringify(round));
 
