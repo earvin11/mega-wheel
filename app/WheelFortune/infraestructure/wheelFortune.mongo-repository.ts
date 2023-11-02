@@ -27,10 +27,25 @@ export class WheelFortuneMongoRepository implements WheelFortuneRepository {
             throw error;
         }
     }
-    public updateByUuid = async(uuid: string, updateWheelDto: UpdateWheelDto): Promise<WheelFortuneEntity> => {
+    public updateByUuid = async(uuid: string, updateWheelDto: UpdateWheelDto): Promise<WheelFortuneEntity | null> => {
         throw new Error("Method not implemented.");
     }
-    public deleteByUuid = async (uuid: string): Promise<WheelFortuneEntity> => {
-        throw new Error("Method not implemented.");
+    public deleteByUuid = async (uuid: string): Promise<WheelFortuneEntity | null> => {
+        try {
+            const wheelDeleted = await GameModel.findOneAndUpdate({ uuid }, { status: false }, { new: true });
+            if(!wheelDeleted) return null;
+            return wheelDeleted
+        } catch (error) {
+            throw error;
+        }
+    }
+    public getManyByProviderId = async (providerId: string): Promise<WheelFortuneEntity[] | []> => {
+        try {
+            const wheels = await GameModel.find({ providerId });
+            if(!wheels) return [];
+            return wheels;
+        } catch (error) {
+            throw error;
+        }
     }
 };
