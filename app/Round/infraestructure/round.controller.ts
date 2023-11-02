@@ -35,32 +35,50 @@ export class RoundController {
     if (timeWait) await sleep(timeWait)
   }
 
-  public start = async (gameUuid: string = '89cc5c2c-b2ae-4694-92a3-b77bb2d42e09') => {
+  public start = async (providerId: string = 'W1') => {
     try {
-      const game = await this.wheelUseCases.getByUuid(gameUuid);
+      const games = await this.wheelUseCases.getManyBryProviderId(providerId);
 
-      if (!game) return
+      if (!games || !games.length) return
 
-      const round = await this.roundUseCases.createRound({ gameUuid: game.uuid!, identifierNumber: '1-1', providerId: game.providerId, start_date: new Date() })
+      const rounds = await Promise.all(
+        games.map(({ providerId, uuid }) => {
+          return this.roundUseCases.createRound({
+            gameUuid: uuid!,
+            identifierNumber: '1',
+            providerId,
+            start_date: new Date()
+          })
+            .then((round) =>
+              this.roundControlRedisUseCases.setRound(round.uuid!, providerId)
+            )
+        })
+      )
 
-      Redis.set(`round:${round.uuid}`, JSON.stringify(round));
+      const betTime = games[0].betTime;
 
-      const betTime = game.betTime;
+      await this.changePhase(providerId, 'bet_time', SocketServer.io, betTime)
+      await Promise.all(
+        rounds.map(round => {
+          this.roundUseCases.closeBetsIndRound(round)
+        })
+      )
 
-      await this.changePhase(game.providerId, 'bet_time', SocketServer.io, betTime)
-      await this.roundUseCases.closeBetsIndRound(round.uuid!)
+      await this.changePhase(providerId, 'processing_jackpot', SocketServer.io)
 
-      await this.changePhase(game.providerId, 'processing_jackpot', SocketServer.io)
+      await Promise.all(
+        rounds.map(round => {
+          this.roundUseCases.setJackpotInRound(round!, { multiplier: 10, number: 20 });
+        })
+      )
 
-      const roundWithJackpot = await this.roundUseCases.setJackpotInRound(round.uuid!, { multiplier: 10, number: 20 });
+      // if (!roundWithJackpot) return
 
-      if (!roundWithJackpot) return
+      // Redis.set(`round:${round.uuid}`, JSON.stringify(roundWithJackpot))
 
-      Redis.set(`round:${round.uuid}`, JSON.stringify(roundWithJackpot))
+      await this.changePhase(providerId, 'ready_jackpot', SocketServer.io)
 
-      await this.changePhase(game.providerId, 'ready_jackpot', SocketServer.io)
-
-      await this.changePhase(game.providerId, 'wait_result', SocketServer.io)
+      await this.changePhase(providerId, 'wait_result', SocketServer.io)
     } catch (error) {
       console.log('ERROR START -> ROUND CONTROLLER', error);
 

@@ -25,6 +25,16 @@ export class WheelFortuneUseCases {
       throw error;
     };
   };
+
+  public getManyBryProviderId = async (providerId: string) => {
+    try {
+      const wheels = await this.wheelFortuneRepository.getManyByProviderId(providerId);
+      return wheels;
+    } catch (error) {
+      throw error;
+    };
+  };
+
   public getByUuid = async (uuid: string) => {
     try {
       const wheel = await this.wheelFortuneRepository.getByUuid(uuid);
@@ -47,6 +57,5 @@ export class WheelFortuneUseCases {
       throw error;
     }
   }
-
 
 }

@@ -13,4 +13,8 @@ export class RoundControlRedisUseCases {
   public getPhase = async (table: string) => {
     return await this.roundRedisRepository.getCurrentPhase(table)
   }
+
+  public setRound = async (uuid: string, providerId: string) => {
+    return await this.roundRedisRepository.setRound(uuid, providerId);
+  }
 }
