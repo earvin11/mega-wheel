@@ -1,4 +1,4 @@
-import { Phase } from "App/Game/domain/types/phase.interfaces";
+import { Phase } from "../types/phase.interfaces"
 
 export interface RoundRedisRepository {
   changeCurrentPhase(table: string, phase: Phase): Promise<void>

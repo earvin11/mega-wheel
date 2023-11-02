@@ -1,0 +1,10 @@
+export type Phase =
+  | 'bet_time'
+  | 'processing_bet'
+  | 'processing_jackpot'
+  | 'ready_jackpot'
+  | 'wait_result'
+  | 'result'
+  | 'finish'
+  | 'end'
+  | 'processing'
