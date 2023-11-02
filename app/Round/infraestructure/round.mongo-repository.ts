@@ -60,4 +60,17 @@ export class RoundMongoRepository implements RoundRepository {
             throw error;
         }
     }
+    public createManyRounds = async (rounds: RoundEntity[]): Promise<RoundEntity[]> => {
+        try {
+            const insertPromises: any[] = [];
+            rounds.forEach( round => {
+                insertPromises.push( this.createRound(round) )
+            });
+
+            const roundsCreated = await Promise.all( insertPromises );
+            return roundsCreated;
+        } catch (error) {
+            throw error;
+        }
+    }
 };

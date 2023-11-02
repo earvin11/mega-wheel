@@ -67,4 +67,16 @@ export class RoundUseCases {
       throw error;
     };
   };
+  public createManyRounds = async (rounds: RoundEntity[]) => {
+    try {
+      const newRounds: any[] = [];
+       rounds.forEach(round => {
+        newRounds.push(this.createRound(round))
+      });
+      const roundsCreated = await this.roundRepository.createManyRounds(newRounds);
+      return roundsCreated;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
