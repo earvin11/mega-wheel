@@ -8,5 +8,6 @@ export interface RoundRepository {
     closeBetsInRound(uuid: string): Promise<RoundEntity | null>;
     setJackpotInRound(uuid: string, jackpotValue: Jackpot): Promise<RoundEntity | null>;
     closeRound(uuid: string, result: number): Promise<RoundEntity | null>;
+    closeRounds(providerId: string, result: number): Promise<any>;
     createManyRounds(rounds: RoundEntity[]): Promise<RoundEntity[]>;
 };

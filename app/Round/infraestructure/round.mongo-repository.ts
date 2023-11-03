@@ -60,6 +60,14 @@ export class RoundMongoRepository implements RoundRepository {
             throw error;
         }
     }
+    public closeRounds = async (providerId: string, result: number): Promise<any> => {
+        try {
+            const roundsClosed = await RoundModel.updateMany({ providerId }, { result, providerId: '999' });
+            return roundsClosed
+        } catch (error) {
+            throw error;
+        }
+    }
     public createManyRounds = async (rounds: RoundEntity[]): Promise<RoundEntity[]> => {
         try {
             const insertPromises: any[] = [];
