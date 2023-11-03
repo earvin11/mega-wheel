@@ -1,7 +1,8 @@
 import Redis from "@ioc:Adonis/Addons/Redis";
 import { Phase } from "App/Game/domain/types/phase.interfaces";
-import { RoundRedisRepository } from "../domain/round.redis.repository";
+import { RoundRedisRepository } from "../domain/repositories/round.redis.repository";
 import { RoundEntity } from "../domain";
+
 
 export class RoundControlRedisRepository implements RoundRedisRepository {
 

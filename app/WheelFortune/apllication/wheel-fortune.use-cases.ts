@@ -56,6 +56,14 @@ export class WheelFortuneUseCases {
     } catch (error) {
       throw error;
     }
+  };
+  public getByProviderId = async (providerId: string) => {
+    try {
+      const wheels = await this.wheelFortuneRepository.getManyByProviderId(providerId);
+      return wheels;
+    } catch (error) {
+      throw error;
+    }
   }
 
 }

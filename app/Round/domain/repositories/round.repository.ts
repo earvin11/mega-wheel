@@ -1,4 +1,4 @@
-import { Jackpot, RoundEntity } from './round.entity';
+import { Jackpot, RoundEntity } from '../round.entity';
 
 export interface RoundRepository {
     createRound(round: RoundEntity): Promise<RoundEntity>;

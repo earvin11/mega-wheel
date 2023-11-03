@@ -1,5 +1,5 @@
-import { Phase } from "App/Game/domain/types/phase.interfaces";
-import { RoundRedisRepository } from "../domain/round.redis.repository";
+import { Phase } from "../domain";
+import { RoundRedisRepository } from "../domain/repositories/round.redis.repository";
 
 export class RoundControlRedisUseCases {
   constructor(

@@ -5,6 +5,7 @@ export interface WheelFortuneRepository {
   getAll(): Promise<WheelFortuneEntity[]>;
   getManyByProviderId(providerId: string): Promise<WheelFortuneEntity[]>;
   getByUuid(uuid: string): Promise<WheelFortuneEntity | null>;
-  updateByUuid(uuid: string, updateWheelDto: UpdateWheelDto): Promise<WheelFortuneEntity>;
-  deleteByUuid(uuid: string): Promise<WheelFortuneEntity>;
+  updateByUuid(uuid: string, updateWheelDto: UpdateWheelDto): Promise<WheelFortuneEntity | null>;
+  deleteByUuid(uuid: string): Promise<WheelFortuneEntity | null>;
+  getManyByProviderId(providerId: string): Promise<WheelFortuneEntity[] | []>;
 };
