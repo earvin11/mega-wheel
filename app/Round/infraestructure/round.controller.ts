@@ -8,6 +8,7 @@ import { sleep } from 'App/Shared/Helpers/sleep';
 import SocketServer from 'App/Services/Ws'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases';
 import { RoundEntity } from '../domain';
+import Logger from '@ioc:Adonis/Core/Logger'
 
 export class RoundController {
   constructor(
@@ -24,7 +25,7 @@ export class RoundController {
   ) => {
 
     await this.roundControlRedisUseCases.toPhase(table, phase)
-    // Logger.info(`change phase: ${phase}`)
+    Logger.info(`change phase: ${phase}`)
     io.emit(CHANGE_PHASE_EVENT, {
       phase: await this.roundControlRedisUseCases.getPhase(table),
       timeWait,
@@ -139,15 +140,26 @@ export class RoundController {
 
       const rounds = await this.roundUseCases.findRoundsByProviderId(providerId);
 
-      // const roundClosed = await this.roundUseCases.closeRound(uuid, result);
+      if (!rounds.length) return response.notFound({ msg: 'Rounds not founded' })
 
-      // const round = await Redis.get(`round:${uuid}`);
-      // const parsedRound = JSON.parse(round as string);
-      // Redis.set(`round:${uuid}`, JSON.stringify({ ...parsedRound, open: false }))
+      await Promise.all(
+        rounds.map(round =>
+          this.roundUseCases.closeRound(round.uuid, result)
+        )
+      )
 
-      // await this.changePhase(roundClosed?.providerId!, 'result', SocketServer.io)
+      await Promise.all(
+        rounds.map(round => {
+          SocketServer.io.to(`${round.gameUuid}`).emit('round:end', {
+            msg: 'Round result',
+            result
+          })
+          return Redis.del(`round:${round.uuid}`)
+        }
+        )
+      )
 
-      // Redis.publish(END_GAME_PUB_SUB, uuid);
+      Redis.publish(END_GAME_PUB_SUB, '');
     } catch (error) {
       console.log('ERROR RESULT ROUND -> ', error);
       response.internalServerError({ error: 'TALK TO ADMINISTRATOR' });
