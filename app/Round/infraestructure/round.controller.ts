@@ -1,12 +1,13 @@
 import { HttpContext } from '@adonisjs/core/build/standalone';
 import { RoundUseCases } from '../application/round.use-cases';
 import Redis from '@ioc:Adonis/Addons/Redis';
-import { END_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants';
+import { CHANGE_PHASE_EVENT, END_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants';
 import { Phase } from 'App/Game/domain/types/phase.interfaces';
 import { RoundControlRedisUseCases } from '../application/round-control.redis.use-cases';
 import { sleep } from 'App/Shared/Helpers/sleep';
 import SocketServer from 'App/Services/Ws'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases';
+import { RoundEntity } from '../domain';
 
 export class RoundController {
   constructor(
@@ -21,18 +22,23 @@ export class RoundController {
     io: any,
     timeWait?: number
   ) => {
-    // const players =
-    //   await this.gameControlUseCase.getEnablePlayersWithOutOptions()
-    // const countPlayers = players.length
 
     await this.roundControlRedisUseCases.toPhase(table, phase)
     // Logger.info(`change phase: ${phase}`)
-    io.emit('a', {
+    io.emit(CHANGE_PHASE_EVENT, {
       phase: await this.roundControlRedisUseCases.getPhase(table),
       timeWait,
-      // countPlayers,
     })
     if (timeWait) await sleep(timeWait)
+  }
+
+  private updateRoundRedis = async (rounds: (RoundEntity | null)[]) => {
+    await Promise.all(
+      rounds.map(round => {
+        if (round)
+          this.roundControlRedisUseCases.setRound(round)
+      })
+    )
   }
 
   public start = async (providerId: string = 'W1') => {
@@ -49,34 +55,50 @@ export class RoundController {
             providerId,
             start_date: new Date()
           })
-            .then((round) =>
-              this.roundControlRedisUseCases.setRound(round.uuid!, providerId)
-            )
+            .then((round) => {
+              this.roundControlRedisUseCases.setRound(round)
+
+              SocketServer.io.to(`${uuid!}`).emit('round:start', {
+                msg: 'Round opened',
+                round: {
+                  start_date: round.start_date,
+                  ID_Ronda: round.uuid,
+                  identifierNumber: round.identifierNumber,
+                }
+              })
+              return round
+            })
         })
       )
 
       const betTime = games[0].betTime;
 
       await this.changePhase(providerId, 'bet_time', SocketServer.io, betTime)
-      await Promise.all(
-        rounds.map(round => {
-          this.roundUseCases.closeBetsIndRound(round)
-        })
+
+      const roundsClosed = await Promise.all(
+        rounds.map(round =>
+          this.roundUseCases.closeBetsIndRound(round.uuid!)
+        )
       )
+
+      await this.updateRoundRedis(roundsClosed);
 
       await this.changePhase(providerId, 'processing_jackpot', SocketServer.io)
 
-      await Promise.all(
-        rounds.map(round => {
-          this.roundUseCases.setJackpotInRound(round!, { multiplier: 10, number: 20 });
-        })
+      const roundsWithJackpot = await Promise.all(
+        rounds.map(round =>
+          this.roundUseCases.setJackpotInRound(round.uuid!, { multiplier: 10, number: 20 })
+        )
       )
 
-      // if (!roundWithJackpot) return
+      await this.updateRoundRedis(roundsWithJackpot);
 
-      // Redis.set(`round:${round.uuid}`, JSON.stringify(roundWithJackpot))
-
-      await this.changePhase(providerId, 'ready_jackpot', SocketServer.io)
+      rounds.map(round => {
+        SocketServer.io.to(`${round.gameUuid!}`).emit('jackpot', {
+          msg: 'Jackpot',
+          jackpot: { multiplier: 10, number: 20 }
+        })
+      })
 
       await this.changePhase(providerId, 'wait_result', SocketServer.io)
     } catch (error) {
@@ -113,17 +135,19 @@ export class RoundController {
 
   public result = async ({ request, response }: HttpContext) => {
     try {
-      const { uuid, result } = request.body();
+      const { providerId, result } = request.body();
 
-      const roundClosed = await this.roundUseCases.closeRound(uuid, result);
+      const rounds = await this.roundUseCases.findRoundsByProviderId(providerId);
 
-      const round = await Redis.get(`round:${uuid}`);
-      const parsedRound = JSON.parse(round as string);
-      Redis.set(`round:${uuid}`, JSON.stringify({ ...parsedRound, open: false }))
+      // const roundClosed = await this.roundUseCases.closeRound(uuid, result);
 
-      await this.changePhase(roundClosed?.providerId!, 'result', SocketServer.io, 4)
+      // const round = await Redis.get(`round:${uuid}`);
+      // const parsedRound = JSON.parse(round as string);
+      // Redis.set(`round:${uuid}`, JSON.stringify({ ...parsedRound, open: false }))
 
-      Redis.publish(END_GAME_PUB_SUB, uuid);
+      // await this.changePhase(roundClosed?.providerId!, 'result', SocketServer.io)
+
+      // Redis.publish(END_GAME_PUB_SUB, uuid);
     } catch (error) {
       console.log('ERROR RESULT ROUND -> ', error);
       response.internalServerError({ error: 'TALK TO ADMINISTRATOR' });

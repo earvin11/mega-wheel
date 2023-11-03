@@ -7,7 +7,7 @@ import { RoundEntity } from "../domain";
 export class RoundControlRedisRepository implements RoundRedisRepository {
 
   private PHASE_KEY = (table: string) => `round-control:${table}:phase`
-  private ROUND_KEY = (table: string, roundUuid: string) => `round-control:${table}:${roundUuid}`
+  private ROUND_KEY = (roundUuid: string) => `round:${roundUuid}`
 
   public changeCurrentPhase = async (table: string, phase: Phase) => {
 
@@ -24,12 +24,9 @@ export class RoundControlRedisRepository implements RoundRedisRepository {
     return phase as Phase
   }
 
-  public setRound = async (uuid: string, providerId: string): Promise<string> => {
-    const key = this.ROUND_KEY(providerId, uuid);
-    const rounds = await Redis.get(key);
-    const parsedRounds = JSON.parse(rounds!);
-    const newRounds = parsedRounds.push(uuid) as RoundEntity[];
-    await Redis.set(key, JSON.stringify(newRounds))
-    return uuid
+  public setRound = async (round: RoundEntity): Promise<void> => {
+    const { uuid } = round;
+    const key = this.ROUND_KEY(uuid!);
+    await Redis.set(key, JSON.stringify(round))
   }
 }
