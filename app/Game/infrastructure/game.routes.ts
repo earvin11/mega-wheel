@@ -2,7 +2,7 @@ import Route from '@ioc:Adonis/Core/Route'
 import { gameController } from './dependencies'
 
 const GameRoutes = () => {
-  Route.post('/create', gameController.createGame).middleware(['validateToken', 'createGame'])
+  Route.post('/create', gameController.createGame).middleware(['validateToken'])
   Route.get('/get-one/:uuid', gameController.getGameByUuid).middleware(['validateToken'])
   Route.get('/all', gameController.getAllGames).middleware(['validateToken'])
   Route.put('/update/:uuid', gameController.updateGame).middleware(['validateToken'])
