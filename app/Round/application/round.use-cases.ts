@@ -67,6 +67,14 @@ export class RoundUseCases {
       throw error;
     };
   };
+  public closeRounds = async (providerId: string, result: number) => {
+    try {
+      const roundsClosed = await this.roundRepository.closeRounds(providerId, result);
+      return roundsClosed
+    } catch (error) {
+      throw error;
+    }
+  }
   public createManyRounds = async (rounds: RoundEntity[]) => {
     try {
       const newRounds: any[] = [];

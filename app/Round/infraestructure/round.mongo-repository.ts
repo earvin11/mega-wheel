@@ -51,11 +51,21 @@ export class RoundMongoRepository implements RoundRepository {
       throw error;
     }
   }
+
   public closeRound = async (uuid: string, result: number): Promise<RoundEntity | null> => {
     try {
       const roundClosed = await RoundModel.findOneAndUpdate({ uuid }, { result }, { new: true });
       if (!roundClosed) return null;
       return roundClosed;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public closeRounds = async (providerId: string, result: number): Promise<any> => {
+    try {
+      const roundsClosed = await RoundModel.updateMany({ providerId }, { result, providerId: '999' });
+      return roundsClosed
     } catch (error) {
       throw error;
     }
