@@ -40,4 +40,5 @@ export class WheelFortuneController {
       response.internalServerError({ error: 'Talk to administrator' });
     }
   }
+
 };

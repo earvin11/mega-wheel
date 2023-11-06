@@ -1,4 +1,4 @@
-import { Phase } from "../domain";
+import { Phase, RoundEntity } from "../domain";
 import { RoundRedisRepository } from "../domain/repositories/round.redis.repository";
 
 export class RoundControlRedisUseCases {
@@ -12,5 +12,9 @@ export class RoundControlRedisUseCases {
 
   public getPhase = async (table: string) => {
     return await this.roundRedisRepository.getCurrentPhase(table)
+  }
+
+  public setRound = async (round: RoundEntity) => {
+    return await this.roundRedisRepository.setRound(round);
   }
 }

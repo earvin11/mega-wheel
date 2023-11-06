@@ -17,8 +17,7 @@ Redis.subscribe(START_GAME_PUB_SUB, async () => {
   roundController.start();
 })
 
-Redis.subscribe(END_GAME_PUB_SUB, async (round) => {
-  Redis.del(`round:${round}`)
+Redis.subscribe(END_GAME_PUB_SUB, async () => {
   Logger.info('FIN DE JUEGO')
   Redis.flushall()
   Redis.publish(START_GAME_PUB_SUB, '')
