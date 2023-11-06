@@ -30,4 +30,14 @@ export class BetUseCases {
       throw error
     }
   }
+  public getWinner = async (filter: any) => {
+    const betWinner = await this.betRepository.getWinner(filter)
+
+    return betWinner
+  }
+  public getWinners = async (filter: any) => {
+    const betWinners = await this.betRepository.getWinners(filter)
+
+    return betWinners
+  }
 }
