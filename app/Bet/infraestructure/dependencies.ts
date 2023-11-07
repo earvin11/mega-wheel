@@ -1,4 +1,4 @@
-import { roundUseCases } from 'App/Round/infraestructure/dependencies'
+import { roundControlRedisUseCases, roundUseCases } from 'App/Round/infraestructure/dependencies'
 import { BetUseCases } from '../application/bet.use-cases'
 import { BetController } from './bet.controller'
 import { BetMongoRepository } from './bet.repository'
@@ -9,5 +9,6 @@ export const betUseCases = new BetUseCases(betMongoRepository)
 export const betController = new BetController(
     betUseCases,
     roundUseCases,
-    wheelFortuneUseCases
+    wheelFortuneUseCases,
+    roundControlRedisUseCases
 )
