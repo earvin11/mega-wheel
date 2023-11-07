@@ -8,6 +8,8 @@ import SocketServer from 'App/Services/Ws'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases';
 import { Phase, RoundEntity } from '../domain';
 import Logger from '@ioc:Adonis/Core/Logger'
+import { GenerateJWT } from 'App/Shared/Helpers/generate-jwt';
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 
 export class RoundController {
   constructor(
@@ -137,7 +139,7 @@ export class RoundController {
     }
   };
 
-  public result = async ({ request, response }: HttpContext) => {
+  public result = async ({ request, response, user }: HttpContextContract) => {
     try {
       const { providerId, result } = request.body();
 
@@ -163,6 +165,13 @@ export class RoundController {
       )
       await this.changePhase(providerId, 'processing_next_round', SocketServer.io);
       Redis.publish(END_GAME_PUB_SUB, '');
+
+      const token = await GenerateJWT(user.uuid, user.userName);
+
+      response.ok({
+        ok: true,
+        token
+      })
     } catch (error) {
       console.log('ERROR RESULT ROUND -> ', error);
       response.internalServerError({ error: 'TALK TO ADMINISTRATOR' });

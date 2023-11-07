@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import Env from '@ioc:Adonis/Core/Env'
 
-export const GenerateJWT = (id: string, userName: string, client: string) => {
+export const GenerateJWT = (id: string, userName: string, client?: string) => {
   return new Promise((resolve, reject) => {
     const payload = { id, userName, client }
 
