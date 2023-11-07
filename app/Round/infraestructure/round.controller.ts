@@ -42,6 +42,7 @@ export class RoundController {
   }
 
   public start = async (providerId: string = 'W1') => {
+
     try {
       const phase = await this.roundControlRedisUseCases.getPhase(providerId);
       if(phase !== 'processing_next_round') return;

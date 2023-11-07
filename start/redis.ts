@@ -12,14 +12,14 @@ import { END_GAME_PUB_SUB, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestr
 import Logger from '@ioc:Adonis/Core/Logger'
 import { roundController } from 'App/Round/infraestructure/dependencies';
 
-Redis.subscribe(START_GAME_PUB_SUB, async () => {
+Redis.subscribe(START_GAME_PUB_SUB, async (providerId) => {
   Logger.info('INICIAR MEGA WHEEL');
-  roundController.start();
+  roundController.start(providerId);
 })
 
-Redis.subscribe(END_GAME_PUB_SUB, async () => {
+Redis.subscribe(END_GAME_PUB_SUB, async (providerId) => {
   Logger.info('FIN DE JUEGO')
-  Redis.flushall()
-  Redis.publish(START_GAME_PUB_SUB, '')
+  // Redis.flushall()
+  Redis.publish(START_GAME_PUB_SUB, providerId)
 })
 
