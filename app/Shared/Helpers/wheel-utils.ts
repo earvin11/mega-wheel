@@ -12,7 +12,6 @@ export const getBetEarnings = (
   result: number,
 ) => {
   const { bet: betData } = bet
-
   const winnerNumber = betData.find((b) => b.number === result)
   const payment = initialPayments.find((b) => b.number === result)
   if (!winnerNumber || !payment) {

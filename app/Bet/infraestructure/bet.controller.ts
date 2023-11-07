@@ -45,7 +45,7 @@ export class BetController {
     const { result } = round
     const filter = useWinnerFilter(result as number)
     const betWinner = await this.betUseCases.getWinner({
-      round: round.uuid,
+      roundUuid: round.uuid,
       ...filter,
     })
 
