@@ -1,5 +1,5 @@
 import Redis from "@ioc:Adonis/Addons/Redis";
-import { Phase } from "App/Game/domain/types/phase.interfaces";
+import { Phase } from "App/Round/domain/types/phase.interfaces";
 import { RoundRedisRepository } from "../domain/repositories/round.redis.repository";
 import { RoundEntity } from "../domain";
 
@@ -15,11 +15,11 @@ export class RoundControlRedisRepository implements RoundRedisRepository {
     await Redis.set(this.PHASE_KEY(table), phase)
   }
 
-  public getCurrentPhase = async (table: string) => {
+  public getCurrentPhase = async (table: string): Promise<Phase> => {
     const phase = await Redis.get(this.PHASE_KEY(table))
     if (!phase) {
-      await Redis.set(this.PHASE_KEY(table), 'processing' as Phase)
-      return 'processing' as Phase
+      await Redis.set(this.PHASE_KEY(table), 'processing_next_round' as Phase)
+      return 'processing_next_round' as Phase
     }
     return phase as Phase
   }
