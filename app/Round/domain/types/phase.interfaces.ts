@@ -7,4 +7,4 @@ export type Phase =
   | 'result'
   | 'finish'
   | 'end'
-  | 'processing'
+  | 'processing_next_round'

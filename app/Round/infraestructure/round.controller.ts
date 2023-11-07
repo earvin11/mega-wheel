@@ -2,12 +2,11 @@ import { HttpContext } from '@adonisjs/core/build/standalone';
 import { RoundUseCases } from '../application/round.use-cases';
 import Redis from '@ioc:Adonis/Addons/Redis';
 import { CHANGE_PHASE_EVENT, END_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants';
-import { Phase } from 'App/Game/domain/types/phase.interfaces';
 import { RoundControlRedisUseCases } from '../application/round-control.redis.use-cases';
 import { sleep } from 'App/Shared/Helpers/sleep';
 import SocketServer from 'App/Services/Ws'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases';
-import { RoundEntity } from '../domain';
+import { Phase, RoundEntity } from '../domain';
 import Logger from '@ioc:Adonis/Core/Logger'
 
 export class RoundController {
@@ -45,7 +44,7 @@ export class RoundController {
   public start = async (providerId: string = 'W1') => {
     try {
       const phase = await this.roundControlRedisUseCases.getPhase(providerId);
-      if(phase !== 'processing') return;
+      if(phase !== 'processing_next_round') return;
 
       const games = await this.wheelUseCases.getManyBryProviderId(providerId);
 
@@ -161,7 +160,7 @@ export class RoundController {
         }
         )
       )
-      await this.changePhase(providerId, 'processing', SocketServer.io);
+      await this.changePhase(providerId, 'processing_next_round', SocketServer.io);
       Redis.publish(END_GAME_PUB_SUB, '');
     } catch (error) {
       console.log('ERROR RESULT ROUND -> ', error);
