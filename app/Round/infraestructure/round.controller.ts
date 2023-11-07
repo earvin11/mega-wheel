@@ -44,6 +44,9 @@ export class RoundController {
 
   public start = async (providerId: string = 'W1') => {
     try {
+      const phase = await this.roundControlRedisUseCases.getPhase(providerId);
+      if(phase !== 'processing') return;
+
       const games = await this.wheelUseCases.getManyBryProviderId(providerId);
 
       if (!games || !games.length) return
@@ -158,7 +161,7 @@ export class RoundController {
         }
         )
       )
-
+      await this.changePhase(providerId, 'processing', SocketServer.io);
       Redis.publish(END_GAME_PUB_SUB, '');
     } catch (error) {
       console.log('ERROR RESULT ROUND -> ', error);

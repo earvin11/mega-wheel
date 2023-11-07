@@ -36,6 +36,7 @@ import RolRoutes from 'App/Rol/infrastructure/role.routes'
 import ChipRoutes from 'App/Chip/infrastructure/chip.routes'
 import WheelRoutes from 'App/WheelFortune/infraestructure/wheelFortune.routes'
 import RoundRoutes from 'App/Round/infraestructure/round.routes'
+import BetRoutes from 'App/Bet/infraestructure/bet.routes'
 
 Route.group(AuthenticationRoutes).prefix('auth')
 Route.group(AuditoriesRoutes).prefix('auditories')
@@ -55,3 +56,4 @@ Route.group(ChipRoutes).prefix('chip')
 //GAME
 Route.group(WheelRoutes).prefix('wheel')
 Route.group(RoundRoutes).prefix('round')
+Route.group(BetRoutes).prefix('bet')
