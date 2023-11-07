@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { BET } from 'App/WheelFortune/infraestructure/constants'
+import Logger from '@ioc:Adonis/Core/Logger'
+import { BET, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
 import SocketServer from '../app/Services/Ws'
+import Redis from '@ioc:Adonis/Addons/Redis';
 const Ws = SocketServer
 Ws.boot()
 
@@ -17,7 +19,7 @@ Ws.boot()
 //   next()
 // })
 
-Ws.io.on('connection', (socket) => {
+Ws.io.on('connection', async (socket) => {
   const gameUuid = socket.handshake.query['gameUuid']
   const user = socket.handshake.query['userId']
   const room = `${gameUuid}`
@@ -30,5 +32,11 @@ Ws.io.on('connection', (socket) => {
   socket.on(BET, () => {
     console.log('BET');
   })
+
+  socket.on('crupier:connection', async (providerId) => {
+    Logger.info('croupier.socket - connect')
+    await Redis.publish(START_GAME_PUB_SUB, providerId)
+  })
+
 });
 

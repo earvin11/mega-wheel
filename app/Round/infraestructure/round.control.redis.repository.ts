@@ -18,8 +18,8 @@ export class RoundControlRedisRepository implements RoundRedisRepository {
   public getCurrentPhase = async (table: string) => {
     const phase = await Redis.get(this.PHASE_KEY(table))
     if (!phase) {
-      await Redis.set(this.PHASE_KEY(table), 'bet_time' as Phase)
-      return 'bet_time' as Phase
+      await Redis.set(this.PHASE_KEY(table), 'processing' as Phase)
+      return 'processing' as Phase
     }
     return phase as Phase
   }

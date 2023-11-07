@@ -43,9 +43,10 @@ export class RoundController {
   }
 
   public start = async (providerId: string = 'W1') => {
+
     try {
       const phase = await this.roundControlRedisUseCases.getPhase(providerId);
-      if(phase !== 'processing') return;
+      if (phase !== 'processing') return this.changePhase(providerId, phase, SocketServer.io);
 
       const games = await this.wheelUseCases.getManyBryProviderId(providerId);
 
@@ -162,7 +163,7 @@ export class RoundController {
         )
       )
       await this.changePhase(providerId, 'processing', SocketServer.io);
-      Redis.publish(END_GAME_PUB_SUB, '');
+      Redis.publish(END_GAME_PUB_SUB, providerId);
     } catch (error) {
       console.log('ERROR RESULT ROUND -> ', error);
       response.internalServerError({ error: 'TALK TO ADMINISTRATOR' });

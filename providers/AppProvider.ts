@@ -15,7 +15,7 @@ export default class AppProvider {
     await import('../config/database')
     await import('../start/socket')
     await import('../app/Shared/Workers/currencies.workers')
-    await import('../start/socket-client-croupier')
+    // await import('../start/socket-client-croupier')
   }
 
   public async shutdown() {
