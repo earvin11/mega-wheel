@@ -1,26 +1,35 @@
 import { HttpContext } from '@adonisjs/core/build/standalone'
+import Redis from '@ioc:Adonis/Addons/Redis'
 import { BetUseCases } from '../application/bet.use-cases'
 import { BetEntity } from '../domain'
 import { getBetEarnings, toteBets, useWinnerFilter } from 'App/Shared/Helpers/wheel-utils'
 import { RoundUseCases } from 'App/Round/application/round.use-cases'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases'
-import BetModel from './bet.model'
+import { RoundControlRedisUseCases } from '../../Round/application/round-control.redis.use-cases';
 
 export class BetController {
   constructor(
     private betUseCases: BetUseCases,
     private roundUseCases: RoundUseCases,
     private wheelFortuneUseCases: WheelFortuneUseCases,
-  ) {}
+    private roundControlRedisUseCases: RoundControlRedisUseCases
+  ) { }
 
   public createBet = async (ctx: HttpContext) => {
     const { request, response } = ctx
 
+    const providerId = request.body().providerId
     const bet = { ...request.body() }
 
     try {
-      const round = await this.roundUseCases.findRoundByUuid(bet.round)
-      if (!round) return response.status(404).json({ error: 'No se encuentra el round' })
+      // const round = await this.roundUseCases.findRoundByUuid(bet.round)
+
+      const round = await Redis.get(`round:${bet.roundUuid}`)
+      if (!round)
+        return response.status(404).json({ error: 'No se encuentra el round' })
+
+      const phaseRound = await this.roundControlRedisUseCases.getPhase(providerId)
+      if (phaseRound !== 'bet_time') return response.unauthorized({ error: 'Round closed' });
 
       const createBet = await this.betUseCases.createBet(bet as BetEntity)
 
@@ -35,7 +44,6 @@ export class BetController {
 
     try {
       const round = await this.roundUseCases.findRoundByUuid(uuid)
-
       if (!round) return response.status(404).json({ error: 'No se encuentra el round' })
 
       const wheelFortune = await this.wheelFortuneUseCases.getByUuid(wheelId)
@@ -55,14 +63,7 @@ export class BetController {
         return response.ok({ message: "you have not won :'(", win: false })
       }
 
-      const bets = await BetModel.aggregate([
-        {
-          $match: {
-            roundUuid: round.uuid,
-          },
-        },
-      ])
-
+      const bets = await this.betUseCases.findBetsByRoundUuid(round.uuid!);
       const totalBets = toteBets(bets)
       const earnings = getBetEarnings(wheelFortune, betWinner, result as number)
 
