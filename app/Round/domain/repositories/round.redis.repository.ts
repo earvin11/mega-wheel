@@ -5,4 +5,5 @@ export interface RoundRedisRepository {
   changeCurrentPhase(table: string, phase: Phase): Promise<void>
   getCurrentPhase(table: string): Promise<Phase>
   setRound(round: RoundEntity): Promise<void>
+  getRound(roundUuid: string): Promise<RoundEntity | null>
 }
