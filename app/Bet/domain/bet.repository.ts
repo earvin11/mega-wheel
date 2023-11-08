@@ -7,4 +7,5 @@ export interface BetRepository {
   findAllBets(): Promise<BetEntity[] | []>
   findBetByUuid(uuid: string): Promise<BetEntity | null>
   payBet(uuid: string): Promise<BetEntity | null>
+  findBetsByRoundUuid(roundUuid: string): Promise<BetEntity[] | []>
 }

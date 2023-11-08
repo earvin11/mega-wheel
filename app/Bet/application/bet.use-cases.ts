@@ -32,12 +32,18 @@ export class BetUseCases {
   }
   public getWinner = async (filter: any) => {
     const betWinner = await this.betRepository.getWinner(filter)
-
     return betWinner
   }
   public getWinners = async (filter: any) => {
     const betWinners = await this.betRepository.getWinners(filter)
-
     return betWinners
+  }
+  public findBetsByRoundUuid = async (roundUuid: string) => {
+    try {
+      const bets = await this.betRepository.findBetsByRoundUuid(roundUuid);
+      return bets;
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -2,7 +2,7 @@ import { HttpContext } from '@adonisjs/core/build/standalone'
 import Redis from '@ioc:Adonis/Addons/Redis'
 import { BetUseCases } from '../application/bet.use-cases'
 import { BetEntity } from '../domain'
-import { getBetEarnings, useWinnerFilter } from 'App/Shared/Helpers/wheel-utils'
+import { getBetEarnings, toteBets, useWinnerFilter } from 'App/Shared/Helpers/wheel-utils'
 import { RoundUseCases } from 'App/Round/application/round.use-cases'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases'
 import { RoundControlRedisUseCases } from '../../Round/application/round-control.redis.use-cases';
@@ -43,34 +43,37 @@ export class BetController {
     const { uuid, wheelId } = request.qs()
 
     try {
-      
       const round = await this.roundUseCases.findRoundByUuid(uuid)
-  
-      if (!round)
-        return response.status(404).json({ error: 'No se encuentra el round' })
-  
+
+      if (!round) return response.status(404).json({ error: 'No se encuentra el round' })
+
       const wheelFortune = await this.wheelFortuneUseCases.getByUuid(wheelId)
       if (!wheelFortune)
         return response.status(404).json({ error: 'No se encuentra el wheelFortune' })
-  
+
       // comprobar player
-  
+
       const { result } = round
       const filter = useWinnerFilter(result as number)
       const betWinner = await this.betUseCases.getWinner({
         roundUuid: round.uuid,
         ...filter,
       })
-  
+
       if (!betWinner) {
         return response.ok({ message: "you have not won :'(", win: false })
       }
+
+      const bets = await this.betUseCases.findBetsByRoundUuid(round.uuid!);
+      const totalBets = toteBets(bets)
       const earnings = getBetEarnings(wheelFortune, betWinner, result as number)
-  
-      return response.status(200).json({ message: "you've won!", win: true, earnings })
+
+      return response
+        .status(200)
+        .json({ message: "you've won!", win: true, earnings, totalBets, bets })
     } catch (error) {
-      console.log('ERROR WINNER => ', error);
-      response.internalServerError({ error: 'Internal server error' });
+      console.log('ERROR WINNER => ', error)
+      response.internalServerError({ error: 'Internal server error' })
     }
   }
 }
