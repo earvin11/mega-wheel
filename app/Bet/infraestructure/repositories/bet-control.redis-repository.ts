@@ -16,5 +16,15 @@ export class BetControlRedisRepository implements BetRedisRepository {
             throw error
         }
     }
+    public getBetsByRound = async (roundUuid: string): Promise<BetEntity[] | []> => {
+        try {
+            const key = this.BET_KEY(roundUuid);
+            const bets = await Redis.get(key)
+            if(!bets) return [];
+            return JSON.parse(bets);
+        } catch (error) {
+            throw error;
+        }
+    }
 
 }

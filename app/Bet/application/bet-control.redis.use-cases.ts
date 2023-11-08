@@ -13,4 +13,12 @@ export class BetControlRedisUseCases {
             throw error;
         }
     }
+
+    public getBetsByRound = async (roundUuid: string) => {
+        try {
+            await this.betRedisRepository.getBetsByRound(roundUuid);
+        } catch (error) {
+            throw error;
+        }
+    }
 }
