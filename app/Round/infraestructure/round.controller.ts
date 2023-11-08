@@ -155,12 +155,15 @@ export class RoundController {
 
       await Promise.all(
         rounds.map(round => {
-          SocketServer.io.to(`${round.gameUuid}`).emit('round:end', {
-            msg: 'Round result',
-            result
-          })
-          return Redis.del(`round:${round.uuid}`)
-        }
+            SocketServer.io.to(`${round.gameUuid}`).emit('round:end', {
+              msg: 'Round result',
+              result
+            })
+          
+            Redis.del(`round:${round.uuid}`);
+            Redis.del(`bets:${round.uuid}`);
+            return;
+          }
         )
       )
       await this.changePhase(providerId, 'processing_next_round', SocketServer.io);
