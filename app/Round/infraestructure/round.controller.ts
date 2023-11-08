@@ -47,7 +47,7 @@ export class RoundController {
 
     try {
       const phase = await this.roundControlRedisUseCases.getPhase(providerId);
-      if (phase !== 'processing_next_round') return;
+      if (phase !== 'processing_next_round') return this.changePhase(providerId, phase, SocketServer.io);
 
       const games = await this.wheelUseCases.getManyBryProviderId(providerId);
 
@@ -155,15 +155,15 @@ export class RoundController {
 
       await Promise.all(
         rounds.map(round => {
-            SocketServer.io.to(`${round.gameUuid}`).emit('round:end', {
-              msg: 'Round result',
-              result
-            })
-          
-            Redis.del(`round:${round.uuid}`);
-            Redis.del(`bets:${round.uuid}`);
-            return;
-          }
+          SocketServer.io.to(`${round.gameUuid}`).emit('round:end', {
+            msg: 'Round result',
+            result
+          })
+
+          Redis.del(`round:${round.uuid}`);
+          Redis.del(`bets:${round.uuid}`);
+          return;
+        }
         )
       )
       await this.changePhase(providerId, 'processing_next_round', SocketServer.io);
