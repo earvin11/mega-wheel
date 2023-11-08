@@ -1,4 +1,4 @@
-import { BetEntity } from './bet.entity'
+import { BetEntity } from '../bet.entity'
 
 export interface BetRepository {
   createBet(bet: BetEntity): Promise<BetEntity>

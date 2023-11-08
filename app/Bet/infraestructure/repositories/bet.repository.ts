@@ -1,7 +1,7 @@
 import Redis from '@ioc:Adonis/Addons/Redis'
-import { BetEntity } from '../domain/bet.entity'
-import { BetRepository } from '../domain/bet.repository'
-import BetModel from './bet.model'
+import { BetEntity } from '../../domain/bet.entity'
+import { BetRepository } from '../../domain/repositories/bet.repository'
+import BetModel from '../bet.model'
 
 export class BetMongoRepository implements BetRepository {
   private BET_KEY = (roundId: string) => `bets:${roundId}`

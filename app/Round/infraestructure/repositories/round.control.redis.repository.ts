@@ -1,6 +1,6 @@
 import Redis from '@ioc:Adonis/Addons/Redis'
-import { RoundRedisRepository } from '../domain/repositories/round.redis.repository'
-import { Phase, RoundEntity } from '../domain'
+import { RoundRedisRepository } from '../../domain/repositories/round.redis.repository'
+import { Phase, RoundEntity } from '../../domain'
 
 export class RoundControlRedisRepository implements RoundRedisRepository {
   private PHASE_KEY = (table: string) => `round-control:${table}:phase`

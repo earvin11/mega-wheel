@@ -1,5 +1,5 @@
-import { Jackpot, RoundEntity, RoundRepository } from '../domain';
-import RoundModel from './round.model';
+import { Jackpot, RoundEntity, RoundRepository } from '../../domain';
+import RoundModel from '../round.model';
 
 export class RoundMongoRepository implements RoundRepository {
   public createRound = async (round: RoundEntity): Promise<RoundEntity> => {

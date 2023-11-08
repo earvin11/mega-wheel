@@ -1,9 +1,9 @@
 import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies';
 import { RoundControlRedisUseCases } from '../application/round-control.redis.use-cases';
 import { RoundUseCases } from '../application/round.use-cases';
-import { RoundControlRedisRepository } from './round.control.redis.repository';
+import { RoundControlRedisRepository } from './repositories/round.control.redis.repository';
 import { RoundController } from './round.controller';
-import { RoundMongoRepository } from './round.mongo-repository';
+import { RoundMongoRepository } from './repositories/round.mongo-repository';
 
 export const roundControlRedisRepository = new RoundControlRedisRepository()
 export const roundControlRedisUseCases = new RoundControlRedisUseCases(roundControlRedisRepository)
