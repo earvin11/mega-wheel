@@ -13,7 +13,7 @@ export class BetController {
     private roundUseCases: RoundUseCases,
     private wheelFortuneUseCases: WheelFortuneUseCases,
     private roundControlRedisUseCases: RoundControlRedisUseCases
-  ) {}
+  ) { }
 
   public createBet = async (ctx: HttpContext) => {
     const { request, response } = ctx
@@ -23,13 +23,13 @@ export class BetController {
 
     try {
       // const round = await this.roundUseCases.findRoundByUuid(bet.round)
-      
-      const round = await Redis.get(`round:${ bet.round }`)
+
+      const round = await Redis.get(`round:${bet.roundUuid}`)
       if (!round)
         return response.status(404).json({ error: 'No se encuentra el round' })
 
       const phaseRound = await this.roundControlRedisUseCases.getPhase(providerId)
-      if(phaseRound !== 'bet_time') return response.unauthorized({ error: 'Round closed' });
+      if (phaseRound !== 'bet_time') return response.unauthorized({ error: 'Round closed' });
 
       const createBet = await this.betUseCases.createBet(bet as BetEntity)
 
@@ -44,7 +44,6 @@ export class BetController {
 
     try {
       const round = await this.roundUseCases.findRoundByUuid(uuid)
-
       if (!round) return response.status(404).json({ error: 'No se encuentra el round' })
 
       const wheelFortune = await this.wheelFortuneUseCases.getByUuid(wheelId)

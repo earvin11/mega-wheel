@@ -7,7 +7,7 @@ const RoundRoutes = () => {
   ]);
 
   Route.patch('/result', roundController.result).middleware([
-    'validateToken',
+    // 'validateToken',
   ]);
 };
 
