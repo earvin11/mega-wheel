@@ -1,8 +1,10 @@
+import Redis from '@ioc:Adonis/Addons/Redis'
 import { BetEntity } from '../domain/bet.entity'
 import { BetRepository } from '../domain/bet.repository'
 import betModel from './bet.model'
 
 export class BetMongoRepository implements BetRepository {
+  private BET_KEY = (roundId: string) => `bets:${roundId}`
   public createBet = async (bet: BetEntity): Promise<BetEntity> => {
     const betCreated = await betModel.create(bet)
     return betCreated
@@ -42,5 +44,14 @@ export class BetMongoRepository implements BetRepository {
       return null
     }
     return bet
+  }
+
+  public setBet = async (bet: BetEntity): Promise<void> => {
+    const { roundUuid } = bet
+    const key = this.BET_KEY(roundUuid!)
+    const betsString = await Redis.get(key)
+    const betsData: BetEntity[] = betsString ? JSON.parse(betsString as string) : []
+    betsData.push(bet)
+    await Redis.set(key, JSON.stringify(betsData))
   }
 }
