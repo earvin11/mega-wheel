@@ -47,7 +47,7 @@ export class RoundController {
 
     try {
       const phase = await this.roundControlRedisUseCases.getPhase(providerId);
-      if(phase !== 'processing_next_round') return;
+      if (phase !== 'processing_next_round') return;
 
       const games = await this.wheelUseCases.getManyBryProviderId(providerId);
 
@@ -164,7 +164,7 @@ export class RoundController {
         )
       )
       await this.changePhase(providerId, 'processing_next_round', SocketServer.io);
-      Redis.publish(END_GAME_PUB_SUB, '');
+      Redis.publish(END_GAME_PUB_SUB, providerId);
 
       const token = await GenerateJWT(user.uuid, user.userName);
 
