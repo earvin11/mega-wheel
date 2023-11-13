@@ -1,8 +1,18 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import Logger from '@ioc:Adonis/Core/Logger'
-import { BET, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
+import { BET, BET_ERROR_EVENT, BET_SUCCESS_EVENT, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
 import SocketServer from '../app/Services/Ws'
 import Redis from '@ioc:Adonis/Addons/Redis';
+import { roundControlRedisUseCases } from 'App/Round/infraestructure/dependencies';
+import { operatorUseCases } from 'App/Operator/infrastructure/dependencies';
+import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies';
+import { currencyUseCases } from 'App/Currencies/infrastructure/dependencies';
+import { playerUseCases } from 'App/Player/infraestructure/dependencies';
+import { calculateAmountBet } from 'App/Shared/Helpers/utils-functions';
+import { betUseCases } from 'App/Bet/infraestructure/dependencies';
+import { BetEntity } from 'App/Bet/domain';
+import { DebitWalletRequest } from 'App/Shared/Interfaces/wallet.interfaces';
+import { sendBet } from 'App/Shared/Helpers/wallet-request';
 const Ws = SocketServer
 Ws.boot()
 
@@ -29,8 +39,120 @@ Ws.io.on('connection', async (socket) => {
 
   socket.join(rooms)
 
-  socket.on(BET, () => {
+  socket.on(BET, async (betData: any) => {
     console.log('BET');
+
+    const {
+      player, //UUID
+      operatorId,
+      gameId,
+      bet,
+      currency,
+      user_id,
+      round: roundId,
+      platform,
+      plaerCountry,
+      player_ip,
+      userAgent
+    } = betData;
+
+    try {
+
+      // Validar ronda
+      const round = await roundControlRedisUseCases.getRound(roundId);
+      if(!round) return Ws.io.to(userRoom)
+        .emit(BET_ERROR_EVENT, { message: 'Error, round not found' });
+
+      // const phaseRound = await roundControlRedisUseCases.getPhase(providerId)
+      //   if (phaseRound !== 'bet_time') return Ws.io.to(userRoom)
+      //   .emit(BET_ERROR_EVENT, { message: 'Round is closed' });
+
+      if(!round.open) return Ws.io.to(userRoom)
+        .emit(BET_ERROR_EVENT, { message: 'Round is closed' });
+
+      // Validar operador
+      const operator = await operatorUseCases.getOperatorByUuid(operatorId);
+      if(!operator || !operator.status || !operator.available)
+        return Ws.io.to(userRoom)
+          .emit(BET_ERROR_EVENT, { message: 'Operator not available' });
+      
+      // Validar juego
+      const game = await wheelFortuneUseCases.getByUuid(gameId);
+      if(!game) return Ws.io.to(userRoom)
+        .emit(BET_ERROR_EVENT, { message: 'Game not found' });
+
+      // Currency
+      const currencyData = await currencyUseCases.getCurrencyByIsoCode(currency);
+      if(!currencyData) return Ws.io.to(userRoom)
+        .emit(BET_ERROR_EVENT, { message: 'Currency not found' });
+
+      // Player
+      const playerData = await playerUseCases.findByUuid(player);
+      if(!playerData || !playerData.status) return Ws.io.to(userRoom)
+        .emit(BET_ERROR_EVENT, { message: 'PLayer not found or disabled' });
+      
+      //TODO: totalAmount
+      const totalAmount = calculateAmountBet(bet)
+      const dataBet = { bet, playerUuid: player, roundUuid: roundId, totalAmount, currencyUuid: currency};
+
+      // Crear apuesta
+      const createBet = await betUseCases.createBet({...dataBet } as BetEntity);
+
+      // Crear objeto para la wallet
+      const objWallet: DebitWalletRequest = {
+        user_id: String(user_id),
+        amount: totalAmount,
+        round_id: String(roundId),
+        bet_id: createBet.uuid!,
+        game_id: game.uuid!,
+        bet_code: createBet.uuid!,
+        bet_date: String(new Date()),
+        platform: String(platform),
+        currency: String(currency),
+        transactionType: 'bet',
+      };
+
+      // Envia la bet a la wallet
+      try {
+        const respWallet: any = await sendBet(operator.endpointBet, objWallet)
+        if (!respWallet.data.ok) {
+          // await logUseCases.createLog({
+          //   typeError: TypesLogsErrors.debit,
+          //   request: objWallet,
+          //   response: respWallet.data,
+          //   error: respWallet.data.msg || '',
+          //   player,
+          // })
+          return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, {
+            msg: respWallet.data.msg,
+            error: 'error in wallet',
+          })
+        }
+      } catch (error) {
+        console.log('ERROR SEND BET TO WALLET -> ', error)
+        // await logUseCases.createLog({
+        //   typeError: TypesLogsErrors.debit,
+        //   request: objWallet,
+        //   response: error,
+        //   player,
+        // })
+        return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, {
+          error: 'error in wallet',
+        })
+      }
+
+      return Ws.io.to(userRoom).emit(BET_SUCCESS_EVENT, {
+        ok: true,
+        message: 'Success',
+        createBet,
+      });
+    } catch (error) {
+      console.log(error)
+      return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, {
+        message: 'Internal server error',
+      })
+    }
+
   })
 
   socket.on('crupier:connection', async (providerId) => {

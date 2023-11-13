@@ -1,4 +1,6 @@
 export const BET = 'bet'
+export const BET_SUCCESS_EVENT = 'bet:success'
+export const BET_ERROR_EVENT = 'bet:err'
 export const CHANGE_PHASE_EVENT = 'change-phase'
 export const START_GAME_PUB_SUB = 'game:start'
 export const END_GAME_PUB_SUB = 'game:end-game'
