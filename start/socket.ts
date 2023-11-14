@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import Logger from '@ioc:Adonis/Core/Logger'
-import { BET, BET_ERROR_EVENT, BET_SUCCESS_EVENT, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
-import SocketServer from '../app/Services/Ws'
 import Redis from '@ioc:Adonis/Addons/Redis';
+import SocketServer from '../app/Services/Ws'
+import { BET, BET_ERROR_EVENT, BET_SUCCESS_EVENT, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
 import { roundControlRedisUseCases } from 'App/Round/infraestructure/dependencies';
+import { betUseCases } from 'App/Bet/infraestructure/dependencies';
 import { operatorUseCases } from 'App/Operator/infrastructure/dependencies';
 import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies';
 import { currencyUseCases } from 'App/Currencies/infrastructure/dependencies';
 import { playerUseCases } from 'App/Player/infraestructure/dependencies';
+
 import { calculateAmountBet } from 'App/Shared/Helpers/utils-functions';
-import { betUseCases } from 'App/Bet/infraestructure/dependencies';
 import { BetEntity } from 'App/Bet/domain';
 import { DebitWalletRequest } from 'App/Shared/Interfaces/wallet.interfaces';
 import { sendBet } from 'App/Shared/Helpers/wallet-request';
@@ -91,12 +92,11 @@ Ws.io.on('connection', async (socket) => {
       if(!playerData || !playerData.status) return Ws.io.to(userRoom)
         .emit(BET_ERROR_EVENT, { message: 'PLayer not found or disabled' });
       
-      //TODO: totalAmount
       const totalAmount = calculateAmountBet(bet)
-      const dataBet = { bet, playerUuid: player, roundUuid: roundId, totalAmount, currencyUuid: currency};
+      const dataBet = { bet, playerUuid: player, roundUuid: roundId, totalAmount, currencyUuid: currency, gameUuid};
 
-      // Crear apuesta
-      const createBet = await betUseCases.createBet({...dataBet } as BetEntity);
+      // Instanciar apuesta
+      const createBet = betUseCases.instanceBet({...dataBet } as BetEntity);
 
       // Crear objeto para la wallet
       const objWallet: DebitWalletRequest = {
@@ -140,6 +140,9 @@ Ws.io.on('connection', async (socket) => {
           error: 'error in wallet',
         })
       }
+
+      // Guardar apuesta
+      await betUseCases.saveBet(createBet);
 
       return Ws.io.to(userRoom).emit(BET_SUCCESS_EVENT, {
         ok: true,
