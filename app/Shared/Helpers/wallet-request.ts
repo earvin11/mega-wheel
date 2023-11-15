@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CreditWalletRequest, DebitWalletRequest } from '../Interfaces/wallet.interfaces';
+import { CreditWalletRequest, DebitWalletRequest, PlayerWalletResponse } from '../Interfaces/wallet.interfaces';
 
 // Metodo para enviar apuesta a la wallet
 export const sendBet = async (endpointBet: string, data: DebitWalletRequest) => {
@@ -36,4 +36,20 @@ export const sendCredit = async(endpointWin: string, data: CreditWalletRequest) 
         throw error;
     }
 };
+
+// Login player
+export const loginPllayerInWallet = async (endpointAuth: string, token: string) => {
+    const walletPlayer = await axios<PlayerWalletResponse>({
+        method: 'POST',
+        url: endpointAuth,
+        data: {
+          token,
+        },
+        validateStatus: function (status) {
+          return status < 500
+        },
+      })
+  
+      return walletPlayer.data
+}
 
