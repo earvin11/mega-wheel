@@ -63,10 +63,10 @@ export class BetMongoRepository implements BetRepository {
           },
         },
       ])
-      if(!bets) return [];
-      return bets;
+      if (!bets) return []
+      return bets
     } catch (error) {
-      throw error;
+      throw error
     }
   }
 }

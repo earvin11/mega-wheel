@@ -2,7 +2,6 @@ import ClientModel from './client.model'
 import { ClientEntity, UpdateClientEntity } from '../domain/client.entity'
 import { ClientRepository } from '../domain/client.repository'
 
-
 export class ClientMongoRepository implements ClientRepository {
   public createClient = async (client: ClientEntity): Promise<ClientEntity> => {
     const clientCreated = await ClientModel.create(client)
@@ -21,7 +20,10 @@ export class ClientMongoRepository implements ClientRepository {
     return client
   }
 
-  public updateClient = async (uuid: string,dataToUpdate:UpdateClientEntity): Promise<ClientEntity | null> => {
+  public updateClient = async (
+    uuid: string,
+    dataToUpdate: UpdateClientEntity,
+  ): Promise<ClientEntity | null> => {
     const client = await ClientModel.findOneAndUpdate({ uuid }, dataToUpdate, {
       new: true,
     }).exec()
@@ -31,7 +33,6 @@ export class ClientMongoRepository implements ClientRepository {
   }
 
   public deleteClient = async (uuid: string): Promise<ClientEntity | null> => {
-    
     const client = await ClientModel.findOneAndUpdate(
       { uuid },
       { status: false },
@@ -40,7 +41,6 @@ export class ClientMongoRepository implements ClientRepository {
     if (!client) return null
 
     return client
-  
   }
 
   public disableClient = async (uuid: string): Promise<ClientEntity | null> => {
@@ -77,16 +77,16 @@ export class ClientMongoRepository implements ClientRepository {
   }
 
   // public getAllGamesInClient = this.getClientByUuid
-  public getAllGamesInClient = async( uuid: string ): Promise<string[] | []> => {
-    const client = await this.getClientByUuid(uuid);
-    if(!client) return [];
+  public getAllGamesInClient = async (uuid: string): Promise<string[] | []> => {
+    const client = await this.getClientByUuid(uuid)
+    if (!client) return []
 
-    const games = client.games;
-    if(!games) return [];
-    
-    return games;
+    const games = client.games
+    if (!games) return []
+
+    return games
   }
-  
+
   public getAvailableGamesInClient = this.getClientByUuid
 
   // public getClientsByGame = async (gameUuid: string): Promise<ClientEntity[] | []> => {
@@ -110,7 +110,7 @@ export class ClientMongoRepository implements ClientRepository {
 
   public removeCurrencyToClient = async (
     uuid: string,
-    currency: string
+    currency: string,
   ): Promise<ClientEntity | null> => {
     const client = await ClientModel.findOneAndUpdate(
       { uuid },

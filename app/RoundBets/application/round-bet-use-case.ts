@@ -1,3 +1,4 @@
+import { BetBody } from 'App/Bet/domain'
 import { RoundBetRepository } from '../domain/repositories/roundBet-repository'
 import { RoundBet } from '../domain/round-bet.value'
 import { RoundBetEntity } from '../domain/roundBet.entity'
@@ -13,5 +14,10 @@ export class RoundBetUseCases {
     } catch (error) {
       throw error
     }
+  }
+
+  public updateRoundBet = async (uuid: string, numbers: BetBody[]) => {
+    const client = await this.roundBetRepository.updateRoundBet(uuid, numbers)
+    return client
   }
 }
