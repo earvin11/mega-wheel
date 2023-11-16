@@ -406,10 +406,13 @@ export class OperatorController {
       if (!operatorExist)
         return response.status(404).json({ error: 'No se encuentra el operador!' })
 
-      if (operatorExist.currencies?.includes(currency))
+      const currencyData = await this.currencyUseCases.getCurrencyByUuid(currency);
+      if(!currencyData) return response.notFound({ error: 'Currency not found' });
+
+      if (operatorExist.currencies?.includes(currencyData.isoCode))
         return response.status(400).json({ error: 'La moneda ya fue agregado el cliente!' })
 
-      const operator = await this.operatorUseCases.addCurrencyToOperator(uuid, currency)
+      const operator = await this.operatorUseCases.addCurrencyToOperator(uuid, currencyData.isoCode)
 
       response.status(200).json({ message: 'Nueva moneda agregada al operador!', operator })
     } catch (error) {
