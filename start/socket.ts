@@ -40,6 +40,13 @@ Ws.io.on('connection', async (socket) => {
 
   socket.join(rooms)
 
+  const playersOnline = await Redis.get(`players-online:${ gameUuid }`) || '[]';
+  const playersParsed = JSON.parse(playersOnline);
+  playersParsed.push(user);
+  // TODO:
+  console.log({ playersParsed })
+  Redis.set(`players-online:${ gameUuid }`, JSON.stringify(playersParsed));
+
   socket.on(BET, async (betData: any) => {
     console.log('BET');
 
@@ -162,6 +169,13 @@ Ws.io.on('connection', async (socket) => {
     Logger.info('croupier.socket - connect')
     await Redis.publish(START_GAME_PUB_SUB, providerId)
   })
+
+  socket.on('disconnect', () => {
+    const newPlayers = playersParsed.filter( player => player !== user);
+    //TODO:
+    console.log({ newPlayers })
+    Redis.set(`players-online:${ gameUuid }`, JSON.stringify(newPlayers));
+  });
 
 });
 
