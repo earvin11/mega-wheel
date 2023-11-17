@@ -1,19 +1,24 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import Logger from '@ioc:Adonis/Core/Logger'
-import Redis from '@ioc:Adonis/Addons/Redis';
+import Redis from '@ioc:Adonis/Addons/Redis'
 import SocketServer from '../app/Services/Ws'
-import { BET, BET_ERROR_EVENT, BET_SUCCESS_EVENT, START_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
-import { roundControlRedisUseCases } from 'App/Round/infraestructure/dependencies';
-import { betUseCases } from 'App/Bet/infraestructure/dependencies';
-import { operatorUseCases } from 'App/Operator/infrastructure/dependencies';
-import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies';
-import { currencyUseCases } from 'App/Currencies/infrastructure/dependencies';
-import { playerUseCases } from 'App/Player/infraestructure/dependencies';
+import {
+  BET,
+  BET_ERROR_EVENT,
+  BET_SUCCESS_EVENT,
+  START_GAME_PUB_SUB,
+} from 'App/WheelFortune/infraestructure/constants'
+import { roundControlRedisUseCases } from 'App/Round/infraestructure/dependencies'
+import { betUseCases } from 'App/Bet/infraestructure/dependencies'
+import { operatorUseCases } from 'App/Operator/infrastructure/dependencies'
+import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies'
+import { currencyUseCases } from 'App/Currencies/infrastructure/dependencies'
+import { playerUseCases } from 'App/Player/infraestructure/dependencies'
 
-import { calculateAmountBet } from 'App/Shared/Helpers/utils-functions';
-import { BetEntity } from 'App/Bet/domain';
-import { DebitWalletRequest } from 'App/Shared/Interfaces/wallet.interfaces';
-import { sendBet } from 'App/Shared/Helpers/wallet-request';
+import { calculateAmountBet } from 'App/Shared/Helpers/utils-functions'
+import { BetEntity } from 'App/Bet/domain'
+import { DebitWalletRequest } from 'App/Shared/Interfaces/wallet.interfaces'
+import { sendBet } from 'App/Shared/Helpers/wallet-request'
 const Ws = SocketServer
 Ws.boot()
 
@@ -33,22 +38,24 @@ Ws.boot()
 Ws.io.on('connection', async (socket) => {
   const gameUuid = socket.handshake.query['gameUuid']
   const user = socket.handshake.query['userId']
+  const isCrupier = socket.handshake.query['crupier']
   const room = `${gameUuid}`
   const userRoom = `${gameUuid}-${user}`
   const userStatus = `${user}`
   const rooms = [room, userRoom, userStatus]
 
   socket.join(rooms)
+  const playersOnline = (await Redis.get(`players-online:${gameUuid}`)) || '[]'
+  const playersParsed = JSON.parse(playersOnline)
 
-  const playersOnline = await Redis.get(`players-online:${ gameUuid }`) || '[]';
-  const playersParsed = JSON.parse(playersOnline);
-  playersParsed.push(user);
-  // TODO:
-  console.log({ playersParsed })
-  Redis.set(`players-online:${ gameUuid }`, JSON.stringify(playersParsed));
+  if (!isCrupier) {
+    playersParsed.push(user)
+    // TODO: BUSCAR EL PLAYER EN MONGO
+    Redis.set(`players-online:${gameUuid}`, JSON.stringify(playersParsed))
+  }
 
   socket.on(BET, async (betData: any) => {
-    console.log('BET');
+    console.log('BET')
 
     const {
       player, //UUID
@@ -61,49 +68,53 @@ Ws.io.on('connection', async (socket) => {
       platform,
       plaerCountry,
       player_ip,
-      userAgent
-    } = betData;
+      userAgent,
+    } = betData
 
     try {
-
       // Validar ronda
-      const round = await roundControlRedisUseCases.getRound(roundId);
-      if(!round) return Ws.io.to(userRoom)
-        .emit(BET_ERROR_EVENT, { message: 'Error, round not found' });
+      const round = await roundControlRedisUseCases.getRound(roundId)
+      if (!round)
+        return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, { message: 'Error, round not found' })
 
       // const phaseRound = await roundControlRedisUseCases.getPhase(providerId)
       //   if (phaseRound !== 'bet_time') return Ws.io.to(userRoom)
       //   .emit(BET_ERROR_EVENT, { message: 'Round is closed' });
 
-      if(!round.open) return Ws.io.to(userRoom)
-        .emit(BET_ERROR_EVENT, { message: 'Round is closed' });
+      if (!round.open)
+        return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, { message: 'Round is closed' })
 
       // Validar operador
-      const operator = await operatorUseCases.getOperatorByUuid(operatorId);
-      if(!operator || !operator.status || !operator.available)
-        return Ws.io.to(userRoom)
-          .emit(BET_ERROR_EVENT, { message: 'Operator not available' });
-      
+      const operator = await operatorUseCases.getOperatorByUuid(operatorId)
+      if (!operator || !operator.status || !operator.available)
+        return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, { message: 'Operator not available' })
+
       // Validar juego
-      const game = await wheelFortuneUseCases.getByUuid(gameId);
-      if(!game) return Ws.io.to(userRoom)
-        .emit(BET_ERROR_EVENT, { message: 'Game not found' });
+      const game = await wheelFortuneUseCases.getByUuid(gameId)
+      if (!game) return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, { message: 'Game not found' })
 
       // Currency
-      const currencyData = await currencyUseCases.getCurrencyByIsoCode(currency);
-      if(!currencyData) return Ws.io.to(userRoom)
-        .emit(BET_ERROR_EVENT, { message: 'Currency not found' });
+      const currencyData = await currencyUseCases.getCurrencyByIsoCode(currency)
+      if (!currencyData)
+        return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, { message: 'Currency not found' })
 
       // Player
-      const playerData = await playerUseCases.findByUuid(player);
-      if(!playerData || !playerData.status) return Ws.io.to(userRoom)
-        .emit(BET_ERROR_EVENT, { message: 'PLayer not found or disabled' });
-      
+      const playerData = await playerUseCases.findByUuid(player)
+      if (!playerData || !playerData.status)
+        return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, { message: 'PLayer not found or disabled' })
+
       const totalAmount = calculateAmountBet(bet)
-      const dataBet = { bet, playerUuid: player, roundUuid: roundId, totalAmount, currencyUuid: currency, gameUuid};
+      const dataBet = {
+        bet,
+        playerUuid: player,
+        roundUuid: roundId,
+        totalAmount,
+        currencyUuid: currency,
+        gameUuid,
+      }
 
       // Instanciar apuesta
-      const createBet = betUseCases.instanceBet({...dataBet } as BetEntity);
+      const createBet = betUseCases.instanceBet({ ...dataBet } as BetEntity)
 
       // Crear objeto para la wallet
       const objWallet: DebitWalletRequest = {
@@ -117,7 +128,7 @@ Ws.io.on('connection', async (socket) => {
         platform: String(platform),
         currency: String(currency),
         transactionType: 'bet',
-      };
+      }
 
       // Envia la bet a la wallet
       try {
@@ -149,20 +160,19 @@ Ws.io.on('connection', async (socket) => {
       }
 
       // Guardar apuesta
-      await betUseCases.saveBet(createBet);
+      await betUseCases.saveBet(createBet)
 
       return Ws.io.to(userRoom).emit(BET_SUCCESS_EVENT, {
         ok: true,
         message: 'Success',
         createBet,
-      });
+      })
     } catch (error) {
       console.log(error)
       return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, {
         message: 'Internal server error',
       })
     }
-
   })
 
   socket.on('crupier:connection', async (providerId) => {
@@ -171,11 +181,8 @@ Ws.io.on('connection', async (socket) => {
   })
 
   socket.on('disconnect', () => {
-    const newPlayers = playersParsed.filter( player => player !== user);
-    //TODO:
-    console.log({ newPlayers })
-    Redis.set(`players-online:${ gameUuid }`, JSON.stringify(newPlayers));
-  });
-
-});
-
+    // TODO: Aqui seria player.uuid
+    const newPlayers = playersParsed.filter((player) => player !== user)
+    Redis.set(`players-online:${gameUuid}`, JSON.stringify(newPlayers))
+  })
+})
