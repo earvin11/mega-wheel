@@ -1,4 +1,4 @@
-const numbers = [1, 2, 5, 8, 10, 15, 20, 30, 40]
+export const numbers = [1, 2, 5, 8, 10, 15, 20, 30, 40]
 
 interface Payment {
   number: number

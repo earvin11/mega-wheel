@@ -29,7 +29,7 @@ const CurrencySchema = new Schema<CurrencyEntity>(
   {
     versionKey: false,
     timestamps: true,
-  }
+  },
 )
 
 const CurrencyModel = model('currency', CurrencySchema)

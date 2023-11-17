@@ -27,11 +27,11 @@ export class RoundControlRedisRepository implements RoundRedisRepository {
   }
   public getRound = async (roundUuid: string): Promise<RoundEntity | null> => {
     try {
-      const round = await Redis.get(`round:${ roundUuid }`);
-      if(round) return JSON.parse(round)
-      return null;
+      const round = await Redis.get(`round:${roundUuid}`)
+      if (round) return JSON.parse(round)
+      return null
     } catch (error) {
-      throw error;
+      throw error
     }
   }
 }

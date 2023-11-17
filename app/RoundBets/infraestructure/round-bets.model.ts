@@ -16,7 +16,12 @@ const roundBetsSchema = new Schema<RoundBetEntity>(
         },
       },
     ],
+    uuid: {
+      type: String,
+    },
   },
   { timestamps: true },
 )
-export default model('RoundBets', roundBetsSchema)
+
+const RoundBetModel = model('RoundBets', roundBetsSchema)
+export default RoundBetModel

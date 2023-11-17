@@ -23,16 +23,17 @@ export class BetController {
     const bet = { ...request.body() }
 
     try {
-      const round = await this.roundControlRedisUseCases.getRound(bet.roundUuid)
+      const round = await this.roundUseCases.findRoundByUuid(bet.roundUuid)
+      // const round = await this.roundControlRedisUseCases.getRound(bet.roundUuid)
       if (!round) return response.status(404).json({ error: 'No se encuentra el round' })
 
-      const phaseRound = await this.roundControlRedisUseCases.getPhase(providerId)
-      if (phaseRound !== 'bet_time') return response.unauthorized({ error: 'Round closed' })
+      /* const phaseRound = await this.roundControlRedisUseCases.getPhase(providerId)
+      if (phaseRound !== 'bet_time') return response.unauthorized({ error: 'Round closed' }) */
 
       const createBet = await this.betUseCases.createBet(bet as BetEntity)
 
       // SET REDIS
-      await this.betControlRedisUseCases.setBet(createBet)
+      // await this.betControlRedisUseCases.setBet(createBet)
 
       return response.status(201).json({ message: 'Bet creado!', createBet })
     } catch (error) {

@@ -23,9 +23,9 @@ export class CurrencyUseCases {
     return currency
   }
 
-  public getCurrencyByIsoCode = async(isoCode: string) => {
-    const currency =  await this.currencyRepository.getCurrencyByIsoCode(isoCode);
-    return currency;
+  public getCurrencyByIsoCode = async (isoCode: string) => {
+    const currency = await this.currencyRepository.getCurrencyByIsoCode(isoCode)
+    return currency
   }
 
   public deleteCurrency = async (uuid: string) => {
