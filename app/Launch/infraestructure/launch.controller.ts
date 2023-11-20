@@ -7,6 +7,7 @@ import { PlayerEntity } from 'App/Player/domain/player.entity';
 import { loginPllayerInWallet } from 'App/Shared/Helpers/wallet-request';
 import { DocumentResponse } from 'App/Shared/Interfaces/document-to-parse.response';
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases';
+import { ChipUseCases } from 'App/Chip/application/ChipUseCase';
 
 export class LaunchController {
     constructor(
@@ -14,7 +15,8 @@ export class LaunchController {
         private operatorUseCases: OperatorUseCases,
         private clientUseCases: ClientUseCases,
         private currencyUseCases: CurrencyUseCases,
-        private wheelUseCases: WheelFortuneUseCases
+        private wheelUseCases: WheelFortuneUseCases,
+        private chipUseCases: ChipUseCases
     ) {}
 
     public launch = async ({ request, response }: HttpContextContract) => {
@@ -67,7 +69,7 @@ export class LaunchController {
             const casino = await this.wheelUseCases.getByUuid(casinoId);
             if (!casino) return response.notFound({ ok: false, msg: 'Game not found' });
 
-            const gameLimits = await this.operatorUseCases.getGameAndLimitsInOperator(operatorUuid, casino.uuid!);
+            const gameLimits = await this.operatorUseCases.getGameAndLimitsInOperator({ operator, gameUuid: casino.uuid! });
             if(!gameLimits) return response.notFound({ error: 'Limits not found' });
 
             const limits = gameLimits.currencyAndLimits.find(
@@ -77,17 +79,18 @@ export class LaunchController {
             if(!limits) return response.notFound({ error: 'Limits not found by currency' });
             const { minBet, maxBet } = limits;
 
+            const chips = await this.chipUseCases.getChipsByOperator(operator.uuid!, currency.isoCode)
+
             const operatorToRes = this.parseDocument(operator)
             // const clientToRes = this.parseDocument(client)
             const currencyToRes = this.parseDocument(currency)
             const playerToRes = this.parseDocument(player!, 'player')
 
-      
-
             response.ok({
                 minBet,
                 maxBet,
                 casino,
+                chips,
                 player: playerToRes,
                 operator: operatorToRes,
                 currency: currencyToRes,

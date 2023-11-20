@@ -269,131 +269,131 @@ export class OperatorController {
     }
   }
 
-  public assignChipsToOperator = async ({ request, response }: HttpContext) => {
-    const { uuid } = request.params()
-    const { chipUuid } = request.body()
+  // public assignChipsToOperator = async ({ request, response }: HttpContext) => {
+  //   const { uuid } = request.params()
+  //   const { chipUuid } = request.body()
 
-    if (!chipUuid) return response.status(400).json({ error: 'Debe enviar el UUID de la ficha!' })
+  //   if (!chipUuid) return response.status(400).json({ error: 'Debe enviar el UUID de la ficha!' })
 
-    try {
-      const operatorExist = await this.operatorUseCases.getOperatorByUuid(uuid)
-      if (!operatorExist)
-        return response.status(404).json({ error: 'No se encuentra el operador!' })
+  //   try {
+  //     const operatorExist = await this.operatorUseCases.getOperatorByUuid(uuid)
+  //     if (!operatorExist)
+  //       return response.status(404).json({ error: 'No se encuentra el operador!' })
 
-      const chipExist = await this.chipUseCases.getChipByUuid(chipUuid)
-      if (!chipExist) return response.status(404).json({ error: 'No se encuentra la ficha!' })
+  //     const chipExist = await this.chipUseCases.getChipByUuid(chipUuid)
+  //     if (!chipExist) return response.status(404).json({ error: 'No se encuentra la ficha!' })
 
-      if (operatorExist.chips?.includes(chipUuid))
-        return response.status(400).json({ error: 'Ya existe la ficha en el operador!' })
+  //     if (operatorExist.chips?.includes(chipUuid))
+  //       return response.status(400).json({ error: 'Ya existe la ficha en el operador!' })
 
-      const operator = await this.operatorUseCases.assignChipsToOperator(uuid, chipUuid)
+  //     const operator = await this.operatorUseCases.assignChipsToOperator(uuid, chipUuid)
 
-      return response.status(200).json({ message: 'Ficha agregada al operador!', operator })
-    } catch (error) {
-      return response
-        .status(400)
-        .json({ message: 'No se pudo agregar la ficha al operador!', error })
-    }
-  }
+  //     return response.status(200).json({ message: 'Ficha agregada al operador!', operator })
+  //   } catch (error) {
+  //     return response
+  //       .status(400)
+  //       .json({ message: 'No se pudo agregar la ficha al operador!', error })
+  //   }
+  // }
 
-  public showOperatorChips = async ({ request, response }: HttpContext) => {
-    const { uuid } = request.params()
+  // public showOperatorChips = async ({ request, response }: HttpContext) => {
+  //   const { uuid } = request.params()
 
-    try {
-      const operator = await this.operatorUseCases.showOperatorChips(uuid)
-      if (!operator) return response.status(404).json({ error: 'No se encuentra el operador!' })
+  //   try {
+  //     const operator = await this.operatorUseCases.showOperatorChips(uuid)
+  //     if (!operator) return response.status(404).json({ error: 'No se encuentra el operador!' })
 
-      const chipsUuidArray = operator.chips
-      if (!chipsUuidArray || chipsUuidArray.length === 0)
-        return response.status(404).json({ error: 'Este operador no tiene fichas asignadas!' })
+  //     const chipsUuidArray = operator.chips
+  //     if (!chipsUuidArray || chipsUuidArray.length === 0)
+  //       return response.status(404).json({ error: 'Este operador no tiene fichas asignadas!' })
 
-      const chips: ChipEntity[] = await this.chipUseCases.getManyChips(chipsUuidArray)
+  //     const chips: ChipEntity[] = await this.chipUseCases.getManyChips(chipsUuidArray)
 
-      return response.status(200).json({ message: 'Fichas del operador listadas!', chips })
-    } catch (error) {
-      return response
-        .status(400)
-        .json({ message: 'No se pudieron obtener las fichas del operador!', error })
-    }
-  }
+  //     return response.status(200).json({ message: 'Fichas del operador listadas!', chips })
+  //   } catch (error) {
+  //     return response
+  //       .status(400)
+  //       .json({ message: 'No se pudieron obtener las fichas del operador!', error })
+  //   }
+  // }
 
-  public deleteChipInOperator = async ({ request, response }: HttpContext) => {
-    const { uuid, chipUuid } = request.params()
+  // public deleteChipInOperator = async ({ request, response }: HttpContext) => {
+  //   const { uuid, chipUuid } = request.params()
 
-    if (!chipUuid) return response.status(400).json({ error: 'Debe enviar el UUID de la ficha!' })
+  //   if (!chipUuid) return response.status(400).json({ error: 'Debe enviar el UUID de la ficha!' })
 
-    try {
-      const operatorExist = await this.operatorUseCases.getOperatorByUuid(uuid)
-      if (!operatorExist)
-        return response.status(404).json({ error: 'No se encuentra el operador!' })
+  //   try {
+  //     const operatorExist = await this.operatorUseCases.getOperatorByUuid(uuid)
+  //     if (!operatorExist)
+  //       return response.status(404).json({ error: 'No se encuentra el operador!' })
 
-      const chipExist = await this.chipUseCases.getChipByUuid(chipUuid)
-      if (!chipExist) return response.status(404).json({ error: 'No se encuentra la ficha!' })
+  //     const chipExist = await this.chipUseCases.getChipByUuid(chipUuid)
+  //     if (!chipExist) return response.status(404).json({ error: 'No se encuentra la ficha!' })
 
-      if (!operatorExist.chips?.includes(chipUuid))
-        return response
-          .status(400)
-          .json({ error: 'la ficha existe, pero no se encuentra asignada a este operador!' })
+  //     if (!operatorExist.chips?.includes(chipUuid))
+  //       return response
+  //         .status(400)
+  //         .json({ error: 'la ficha existe, pero no se encuentra asignada a este operador!' })
 
-      const operator = await this.operatorUseCases.deleteChipInOperator(uuid, chipUuid)
+  //     const operator = await this.operatorUseCases.deleteChipInOperator(uuid, chipUuid)
 
-      return response.status(200).json({ message: 'Ficha eliminada del operador!', operator })
-    } catch (error) {
-      return response
-        .status(400)
-        .json({ message: 'No se pudo eliminar la ficha del operador!', error })
-    }
-  }
+  //     return response.status(200).json({ message: 'Ficha eliminada del operador!', operator })
+  //   } catch (error) {
+  //     return response
+  //       .status(400)
+  //       .json({ message: 'No se pudo eliminar la ficha del operador!', error })
+  //   }
+  // }
 
-  public addDefaultChips = async ({ request, response }: HttpContext) => {
-    const { uuid, isoCode } = request.params()
-    try {
-      const operatorExist = await this.operatorUseCases.getOperatorByUuid(uuid)
-      if (!operatorExist) return response.status(400).json({ error: 'Operador no encontrado' })
+  // public addDefaultChips = async ({ request, response }: HttpContext) => {
+  //   const { uuid, isoCode } = request.params()
+  //   try {
+  //     const operatorExist = await this.operatorUseCases.getOperatorByUuid(uuid)
+  //     if (!operatorExist) return response.status(400).json({ error: 'Operador no encontrado' })
 
-      const currencyExist = await this.currencyUseCases.getCurrencyByIsoCode(isoCode)
-      if (!currencyExist) return response.status(400).json({ error: 'Currency no encontrado' })
+  //     const currencyExist = await this.currencyUseCases.getCurrencyByIsoCode(isoCode)
+  //     if (!currencyExist) return response.status(400).json({ error: 'Currency no encontrado' })
 
-      const operator = await this.operatorUseCases.addDefaultChips(uuid, isoCode)
+  //     const operator = await this.operatorUseCases.addDefaultChips(uuid, isoCode)
 
-      response.status(201).json({ message: 'Currencies por default agregado', operator })
-    } catch (error) {
-      console.log('ERROR IN ADD DEFAULT CHIPS -> OPERATOR CONTROLLER', error)
-      response.status(400).json({ message: 'No se pudo agregar las fichas al operador!', error })
-    }
-  }
+  //     response.status(201).json({ message: 'Currencies por default agregado', operator })
+  //   } catch (error) {
+  //     console.log('ERROR IN ADD DEFAULT CHIPS -> OPERATOR CONTROLLER', error)
+  //     response.status(400).json({ message: 'No se pudo agregar las fichas al operador!', error })
+  //   }
+  // }
 
-  public updateChip = async ({ request, response }: HttpContext) => {
-    const { uuid, chipUuid } = request.params()
-    const { newChip } = request.body()
+  // public updateChip = async ({ request, response }: HttpContext) => {
+  //   const { uuid, chipUuid } = request.params()
+  //   const { newChip } = request.body()
 
-    try {
-      const operatorExist = await this.operatorUseCases.getOperatorByUuid(uuid)
-      if (!operatorExist)
-        return response.status(404).json({ error: 'No se encuentra el operador!' })
+  //   try {
+  //     const operatorExist = await this.operatorUseCases.getOperatorByUuid(uuid)
+  //     if (!operatorExist)
+  //       return response.status(404).json({ error: 'No se encuentra el operador!' })
 
-      const chipExist = await this.chipUseCases.getChipByUuid(chipUuid)
-      if (!chipExist) return response.status(404).json({ error: 'No se encuentra la ficha!' })
+  //     const chipExist = await this.chipUseCases.getChipByUuid(chipUuid)
+  //     if (!chipExist) return response.status(404).json({ error: 'No se encuentra la ficha!' })
 
-      if (!operatorExist.chips?.includes(chipUuid))
-        return response
-          .status(400)
-          .json({ error: 'la ficha existe, pero no se encuentra asignada a este operador!' })
+  //     if (!operatorExist.chips?.includes(chipUuid))
+  //       return response
+  //         .status(400)
+  //         .json({ error: 'la ficha existe, pero no se encuentra asignada a este operador!' })
 
-      const chip: UpdateChipEntity = {
-        color: newChip.color,
-        value: newChip.value,
-        currency: newChip.currency,
-      }
+  //     const chip: UpdateChipEntity = {
+  //       color: newChip.color,
+  //       value: newChip.value,
+  //       currency: newChip.currency,
+  //     }
 
-      const operator = await this.operatorUseCases.updateChip(uuid, chipUuid, chip)
+  //     const operator = await this.operatorUseCases.updateChip(uuid, chipUuid, chip)
 
-      response.status(201).json({ message: 'Chip actualizada', operator })
-    } catch (error) {
-      console.log('ERROR UPDATE CHIP', error)
-      response.status(400).json({ message: 'Error actualizando la chip', error })
-    }
-  }
+  //     response.status(201).json({ message: 'Chip actualizada', operator })
+  //   } catch (error) {
+  //     console.log('ERROR UPDATE CHIP', error)
+  //     response.status(400).json({ message: 'Error actualizando la chip', error })
+  //   }
+  // }
 
   // ! CURRENCIES
   public addCurrencyToOperator = async ({ request, response }: HttpContext) => {

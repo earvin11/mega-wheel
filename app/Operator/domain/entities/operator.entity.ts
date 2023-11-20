@@ -14,7 +14,7 @@ export interface OperatorEntity {
   casinoToken: string
   available?: boolean
   uuid?: string
-  chips?: string[]
+  // chips?: string[]
   currencies?: string[]
   operatorGamesLimits?: OperatorGameLimitsEntity[]
 }

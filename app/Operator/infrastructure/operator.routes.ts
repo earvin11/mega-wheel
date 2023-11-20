@@ -18,17 +18,17 @@ const OperatorRoutes = () => {
   Route.get('/client/:clientUuid', operatorController.getOperatorsByClient).middleware([
     'validateToken',
   ])
-  // CHIPS
-  Route.put('/:uuid/assign-chip', operatorController.assignChipsToOperator).middleware([
-    'validateToken',
-  ])
-  Route.get('/:uuid/chips', operatorController.showOperatorChips).middleware(['validateToken'])
-  Route.delete('/:uuid/delete-chip/:chipUuid', operatorController.deleteChipInOperator).middleware([
-    'validateToken',
-  ])
+  // // CHIPS
+  // Route.put('/:uuid/assign-chip', operatorController.assignChipsToOperator).middleware([
+  //   //'validateToken',
+  // ])
+  // Route.get('/:uuid/chips', operatorController.showOperatorChips).middleware(['validateToken'])
+  // Route.delete('/:uuid/delete-chip/:chipUuid', operatorController.deleteChipInOperator).middleware([
+  //   'validateToken',
+  // ])
 
-  Route.post('/:uuid/default-chips/:isoCode',operatorController.addDefaultChips).middleware(['validateToken'])
-  Route.put('/:uuid/update-chip/:chipUuid',operatorController.updateChip).middleware(['validateToken'])
+  // Route.post('/:uuid/default-chips/:isoCode',operatorController.addDefaultChips).middleware(['validateToken'])
+  // Route.put('/:uuid/update-chip/:chipUuid',operatorController.updateChip).middleware(['validateToken'])
   // CURRENCIES
   Route.put('/:uuid/add-currency', operatorController.addCurrencyToOperator).middleware([
     // 'validateToken',

@@ -75,7 +75,6 @@ export class OperatorUseCases {
   }
 
   // CURRENCIES
-
   public addCurrencyToOperator = async (uuid: string, currency: string) => {
     const operator = await this.operatorRepository.addCurrencyToOperator(uuid, currency)
     return operator
@@ -104,9 +103,9 @@ export class OperatorUseCases {
       throw error;
     }
   }
-  public getGameAndLimitsInOperator = async (uuid: string, gameUuid: string): Promise<OperatorGameLimitsEntity | null> => {
+  public getGameAndLimitsInOperator = async ({ uuid, operator, gameUuid }:{uuid?: string; operator?: OperatorEntity; gameUuid: string}): Promise<OperatorGameLimitsEntity | null> => {
     try {
-      const operatorGameLimit = await this.operatorRepository.getGameAndLimitsInOperator(uuid, gameUuid);
+      const operatorGameLimit = await this.operatorRepository.getGameAndLimitsInOperator({ gameUuid, uuid, operator });
       return operatorGameLimit;
     } catch (error) {
       throw error;
