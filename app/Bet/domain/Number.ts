@@ -43,3 +43,5 @@ export const initialPayments: Payment[] = [
     multiplier: 41,
   },
 ]
+
+export const multisAllowed = [5, 8, 10, 15, 20, 30, 50, 88, 100]
