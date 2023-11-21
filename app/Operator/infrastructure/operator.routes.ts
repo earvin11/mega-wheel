@@ -9,8 +9,8 @@ const OperatorRoutes = () => {
   Route.get('/', operatorController.getAllOperators).middleware(['validateToken'])
   Route.put('/:uuid/disable', operatorController.disableOperator).middleware(['validateToken'])
   Route.put('/:uuid/enable', operatorController.enableOperator).middleware(['validateToken'])
-  Route.get('/:uuid', operatorController.getOperatorByUuid).middleware(['validateToken'])
-  Route.delete('/:uuid', operatorController.deleteOperator).middleware(['validateToken'])
+  Route.get('/:uuid', operatorController.getOperatorByUuid)//.middleware(['validateToken'])
+  Route.delete('/:uuid', operatorController.deleteOperator)//.middleware(['validateToken'])
   Route.put('/:uuid/update-urls', operatorController.updateOperatorUrls).middleware([
     'validateToken',
   ])
@@ -40,6 +40,7 @@ const OperatorRoutes = () => {
   // GAMES AND LIMITS 
   Route.patch('/:uuid/add-game-and-limits', operatorController.addGameLimitsInOperator);
   Route.patch('/:uuid/add-config-payments/:gameUuid',operatorController.addConfigPaymentInGame);
+  Route.get('/:uuid/games-by-currency/:currency', operatorController.getGamesByCurrency);
 }
 
 export default OperatorRoutes

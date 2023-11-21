@@ -17,6 +17,7 @@ import { ChipUseCases } from 'App/Chip/application/ChipUseCase'
 import { ClientUseCases } from 'App/Client/application/ClientUseCases'
 import { CurrencyAndLimitsEntity } from '../domain/entities'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 
 export class OperatorController {
   constructor(
@@ -490,6 +491,17 @@ export class OperatorController {
     } catch (error) {
       console.log(error);
       response.internalServerError({ error: 'Error agregando game and limits in operator' });
+    }
+  }
+
+  public getGamesByCurrency = async ({ request, response}: HttpContextContract) => {
+    const { uuid, currency } = request.params();
+    try {
+      const resp = await this.operatorUseCases.getGamesByCurrencyInOperator(uuid, currency);
+      response.ok(resp);
+    } catch (error) {
+      console.log('ERROR GET GAMES BY CURRENCY ->', error);
+      response.internalServerError({ error: 'Error lobby' })
     }
   }
 }

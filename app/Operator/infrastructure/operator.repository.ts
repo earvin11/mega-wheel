@@ -302,4 +302,24 @@ export class OperatorMongoRepository implements OperatorRepository {
       throw error;
     }  
   }
+
+  public getGamesByCurrencyInOperator = async (uuid: string, isoCode: string): Promise<OperatorGameLimitsEntity[] | []> => {
+    try {
+      const operator = await this.getOperatorByUuid(uuid);
+      if(!operator?.operatorGamesLimits) return [];
+
+      const data: OperatorGameLimitsEntity[] = [];
+      
+      operator.operatorGamesLimits.forEach( gameLimit =>{
+        gameLimit.currencyAndLimits.forEach( cl => {
+          if (cl.currency.isoCode === isoCode) {
+            data.push(gameLimit)
+          };
+        });
+      })
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

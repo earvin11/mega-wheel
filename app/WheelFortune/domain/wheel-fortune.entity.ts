@@ -16,6 +16,7 @@ export interface WheelFortuneEntity {
   logo: string;
   language: string;
   type?: string;
+  launchUrl: string;
 };
 
 export type UpdateWheelDto = Pick<WheelFortuneEntity, 'imgBackgrout' | 'providerId' | 'urlTransmision'>;

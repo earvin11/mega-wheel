@@ -1,4 +1,4 @@
-import { ChipEntity } from 'App/Chip/domain/chip.entity'
+// import { ChipEntity } from 'App/Chip/domain/chip.entity'
 import { OperatorEntity } from './entities/operator.entity'
 import { OperatorUrlEntity } from './entities/operatorUrl.entity'
 import { UpdateOperatorEntity } from './entities/updateOperator.entity'
@@ -31,4 +31,6 @@ export interface OperatorRepository {
   deleteGameAndLimitsInOperator(uuid: string, gameUuid: string): Promise<OperatorEntity | null>;
   // CONFIG PAYMENTS
   addConfigPaymentInGame(uuid: string, gameUuid: string, configPayment: ConfigPaymentEntity[]): Promise<OperatorEntity | null>;
+  // INTEGRATION LOBBY
+  getGamesByCurrencyInOperator(uuid: string, isoCode: string): Promise<OperatorGameLimitsEntity[] | []>;
 }
