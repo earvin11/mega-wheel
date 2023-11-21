@@ -66,12 +66,9 @@ export class BetController {
       }
 
       const bets = await this.betUseCases.findBetsByRoundUuid(round.uuid!)
-      const totalBets = toteBets(bets)
       const earnings = getBetEarnings(wheelFortune, betWinner, result as number)
 
-      return response
-        .status(200)
-        .json({ message: "you've won!", win: true, earnings, totalBets, bets })
+      return response.status(200).json({ message: "you've won!", win: true, earnings, bets })
     } catch (error) {
       console.log('ERROR WINNER => ', error)
       response.internalServerError({ error: 'Internal server error' })
