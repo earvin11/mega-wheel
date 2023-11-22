@@ -17,8 +17,12 @@ export class RoundControlRedisUseCases {
   public setRound = async (round: RoundEntity) => {
     return await this.roundRedisRepository.setRound(round);
   }
-  
+
   public getRound = async (roundUuid: string) => {
     return await this.roundRedisRepository.getRound(roundUuid);
+  }
+
+  public setGamesActive = async (games: string[]) => {
+    return await this.roundRedisRepository.setGamesActive(games)
   }
 }

@@ -4,10 +4,12 @@ import { GameRepository } from '../domain/game.repository'
 import { GameLimits } from '../domain/limits.entity'
 import { UpdateGameEntity } from '../domain/updateGame.entity'
 import GameModel from './game.model'
+import GameModelWheel from '../../WheelFortune/infraestructure/wheelFortune.model'
+import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 
 export class GameMongoRepository implements GameRepository {
-  
-  getGameByUuid(uuid: string): Promise<GameEntity | null> {
+
+  public getGameByUuid(uuid: string): Promise<GameEntity | null> {
     throw new Error('Method not implemented.')
   }
   public createGame = async (game: GameEntity): Promise<GameEntity> => {
@@ -21,8 +23,8 @@ export class GameMongoRepository implements GameRepository {
   //   return game
   // }
 
-  public getAllGames = async (): Promise<GameEntity[] | []> => {
-    const games = await GameModel.find({ status: true }).exec()
+  public getAllGames = async (): Promise<GameEntity[] | WheelFortuneEntity[] | []> => {
+    const games = await GameModelWheel.find({ status: true, type: 'WHEEL' }).exec()
     return games
   }
 

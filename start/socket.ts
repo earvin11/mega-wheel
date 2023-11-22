@@ -19,6 +19,7 @@ import { calculateAmountBet } from 'App/Shared/Helpers/utils-functions'
 import { BetEntity } from 'App/Bet/domain'
 import { DebitWalletRequest } from 'App/Shared/Interfaces/wallet.interfaces'
 import { sendBet } from 'App/Shared/Helpers/wallet-request'
+import { getPlayersOnline } from 'App/Shared/Helpers/get-players-online'
 const Ws = SocketServer
 Ws.boot()
 
@@ -45,13 +46,30 @@ Ws.io.on('connection', async (socket) => {
   const rooms = [room, userRoom, userStatus]
 
   socket.join(rooms)
+
+  const dataUser = {
+    socketID: socket.id,
+    userId: socket.handshake.query['userId'],
+    room: socket.handshake.query['gameUuid'],
+  }
+
   const playersOnline = (await Redis.get(`players-online:${gameUuid}`)) || '[]'
   const playersParsed = JSON.parse(playersOnline)
 
   if (!isCrupier) {
-    playersParsed.push(user)
+    const existSession = playersParsed.findIndex((user) => user.userId === dataUser.userId)
+
+    if (existSession === -1) {
+      playersParsed.push(dataUser)
+    } else {
+      playersParsed[existSession] = dataUser
+    }
     // TODO: BUSCAR EL PLAYER EN MONGO
     Redis.set(`players-online:${gameUuid}`, JSON.stringify(playersParsed))
+
+    const playersOnline: any[] = await getPlayersOnline()
+
+    Ws.io.emit('users-online', { usersOnline: playersOnline })
   }
 
   socket.on(BET, async (betData: any) => {
@@ -180,9 +198,12 @@ Ws.io.on('connection', async (socket) => {
     await Redis.publish(START_GAME_PUB_SUB, providerId)
   })
 
-  socket.on('disconnect', () => {
-    // TODO: Aqui seria player.uuid
-    const newPlayers = playersParsed.filter((player) => player !== user)
+  socket.on('disconnect', async () => {
+    const newPlayers = playersParsed.filter((player) => player.userId !== user)
     Redis.set(`players-online:${gameUuid}`, JSON.stringify(newPlayers))
+
+    const playersOnline: any[] = await getPlayersOnline()
+
+    Ws.io.emit('users-online', { usersOnline: playersOnline })
   })
 })

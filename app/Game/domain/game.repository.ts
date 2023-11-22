@@ -1,3 +1,4 @@
+import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 import { GameEntity } from './game.entity'
 import { GameLimits } from './limits.entity'
 import { UpdateGameEntity } from './updateGame.entity'
@@ -5,7 +6,7 @@ import { UpdateGameEntity } from './updateGame.entity'
 export interface GameRepository {
   createGame(game: GameEntity): Promise<GameEntity>
   getGameByUuid(uuid: string): Promise<GameEntity | null>
-  getAllGames(): Promise<GameEntity[] | []>
+  getAllGames(): Promise<GameEntity[] | WheelFortuneEntity[] | []>
   updateGame(uuid: string, dataToUpdate: UpdateGameEntity): Promise<GameEntity | null>
   deleteGame(uuid: string): Promise<GameEntity | null>
   addOperatorToGame(uuid: string, operatorUuid: string): Promise<GameEntity | null>
