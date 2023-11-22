@@ -8,7 +8,7 @@ import { chipUseCases } from 'App/Chip/infrastructure/dependencies'
 import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies'
 
 const operatorRepository = new OperatorMongoRepository(
-    chipUseCases
+    // chipUseCases
 )
 export const operatorUseCases = new OperatorUseCases(operatorRepository)
 const operatorController = new OperatorController(
