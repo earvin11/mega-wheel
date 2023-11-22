@@ -21,8 +21,8 @@ export class ClientUseCases {
     return client
   }
 
-  public updateClient = async (uuid: string,dataToUpdate:UpdateClientEntity) => {
-    const client = await this.clientRepository.updateClient(uuid,dataToUpdate)
+  public updateClient = async (uuid: string, dataToUpdate: UpdateClientEntity) => {
+    const client = await this.clientRepository.updateClient(uuid, dataToUpdate)
     return client
   }
 
@@ -72,7 +72,7 @@ export class ClientUseCases {
   }
 
   public deleteGameInClient = async (uuid: string, gameUuid: string) => {
-    const client = await this.clientRepository.deleteGameInClient(uuid, gameUuid);
+    const client = await this.clientRepository.deleteGameInClient(uuid, gameUuid)
     return client
   }
 }

@@ -4,8 +4,8 @@ import { BetEntity } from '../domain'
 import { getBetEarnings, toteBets, useWinnerFilter } from 'App/Shared/Helpers/wheel-utils'
 import { RoundUseCases } from 'App/Round/application/round.use-cases'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases'
-import { RoundControlRedisUseCases } from '../../Round/application/round-control.redis.use-cases';
-import { BetControlRedisUseCases } from '../application/bet-control.redis.use-cases';
+import { RoundControlRedisUseCases } from '../../Round/application/round-control.redis.use-cases'
+import { BetControlRedisUseCases } from '../application/bet-control.redis.use-cases'
 
 export class BetController {
   constructor(
@@ -14,7 +14,7 @@ export class BetController {
     private roundUseCases: RoundUseCases,
     private roundControlRedisUseCases: RoundControlRedisUseCases,
     private wheelFortuneUseCases: WheelFortuneUseCases,
-  ) { }
+  ) {}
 
   public createBet = async (ctx: HttpContext) => {
     const { request, response } = ctx
@@ -23,17 +23,17 @@ export class BetController {
     const bet = { ...request.body() }
 
     try {
-      const round = await this.roundControlRedisUseCases.getRound(bet.roundUuid)
-      if (!round)
-        return response.status(404).json({ error: 'No se encuentra el round' })
+      const round = await this.roundUseCases.findRoundByUuid(bet.roundUuid)
+      // const round = await this.roundControlRedisUseCases.getRound(bet.roundUuid)
+      if (!round) return response.status(404).json({ error: 'No se encuentra el round' })
 
-      const phaseRound = await this.roundControlRedisUseCases.getPhase(providerId)
-      if (phaseRound !== 'bet_time') return response.unauthorized({ error: 'Round closed' });
+      /* const phaseRound = await this.roundControlRedisUseCases.getPhase(providerId)
+      if (phaseRound !== 'bet_time') return response.unauthorized({ error: 'Round closed' }) */
 
       const createBet = await this.betUseCases.createBet(bet as BetEntity)
 
       // SET REDIS
-      await this.betControlRedisUseCases.setBet(createBet)
+      // await this.betControlRedisUseCases.setBet(createBet)
 
       return response.status(201).json({ message: 'Bet creado!', createBet })
     } catch (error) {
@@ -65,13 +65,10 @@ export class BetController {
         return response.ok({ message: "you have not won :'(", win: false })
       }
 
-      const bets = await this.betUseCases.findBetsByRoundUuid(round.uuid!);
-      const totalBets = toteBets(bets)
+      const bets = await this.betUseCases.findBetsByRoundUuid(round.uuid!)
       const earnings = getBetEarnings(wheelFortune, betWinner, result as number)
 
-      return response
-        .status(200)
-        .json({ message: "you've won!", win: true, earnings, totalBets, bets })
+      return response.status(200).json({ message: "you've won!", win: true, earnings, bets })
     } catch (error) {
       console.log('ERROR WINNER => ', error)
       response.internalServerError({ error: 'Internal server error' })

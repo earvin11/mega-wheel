@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { HttpContext } from '@adonisjs/core/build/standalone'
 import { RoundUseCases } from '../application/round.use-cases'
 import Redis from '@ioc:Adonis/Addons/Redis'
@@ -10,12 +11,20 @@ import { Phase, RoundEntity } from '../domain'
 import Logger from '@ioc:Adonis/Core/Logger'
 import { GenerateJWT } from 'App/Shared/Helpers/generate-jwt'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { RoundBetUseCases } from 'App/RoundBets/application/round-bet-use-case'
+import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
+import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
+import BetModel from 'App/Bet/infraestructure/bet.model'
+import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
+import { roundBetUpdater } from 'App/Shared/Helpers/wheel-utils'
+import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
 
 export class RoundController {
   constructor(
     private roundUseCases: RoundUseCases,
     private roundControlRedisUseCases: RoundControlRedisUseCases,
     private wheelUseCases: WheelFortuneUseCases,
+    private roundBetUseCases: RoundBetUseCases,
   ) { }
 
   private changePhase = async (table: string, phase: Phase, io: any, timeWait?: number) => {
@@ -119,7 +128,12 @@ export class RoundController {
         end_date,
       })
 
-      response.ok({ message: 'Round created', round: newRound })
+      const roundBet = {
+        roundUuid: newRound.uuid as string,
+      }
+      const newRoundBet = await this.roundBetUseCases.createRoundBet(roundBet as RoundBetEntity)
+
+      response.ok({ message: 'Round created', round: newRound, newRoundBet })
     } catch (error) {
       console.log('ERROR CREATE ROUND -> ', error)
       response.internalServerError({ error: 'TALK TO ADMINISTRATOR' })
@@ -161,5 +175,16 @@ export class RoundController {
       console.log('ERROR RESULT ROUND -> ', error)
       response.internalServerError({ error: 'TALK TO ADMINISTRATOR' })
     }
+  }
+  public updateRound = async ({ request, response }: HttpContext) => {
+    const { uuid } = request.body()
+
+    const round = await this.roundUseCases.findRoundByUuid(uuid)
+    const roundBet = await RoundBetModel.findOne({ roundUuid: uuid }).exec()
+    const bets = await BetModel.find({ roundUuid: uuid })
+    const currencies = await CurrencyModel.find()
+    const { numbers } = roundBetUpdater(roundBet as RoundBet, bets, currencies)
+    const newRoundBet = this.roundBetUseCases.updateRoundBet(roundBet?.uuid as string, numbers)
+    response.ok({ round, roundBet, bets, currencies, newRoundBet })
   }
 }

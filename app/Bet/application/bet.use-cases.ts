@@ -40,10 +40,10 @@ export class BetUseCases {
   }
   public findBetsByRoundUuid = async (roundUuid: string) => {
     try {
-      const bets = await this.betRepository.findBetsByRoundUuid(roundUuid);
-      return bets;
+      const bets = await this.betRepository.findBetsByRoundUuid(roundUuid)
+      return bets
     } catch (error) {
-      throw error;
+      throw error
     }
   }
   public instanceBet = (bet: BetEntity) => {

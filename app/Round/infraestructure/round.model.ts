@@ -1,7 +1,8 @@
-import { Schema, model } from 'mongoose';
-import { RoundEntity } from '../domain';
+import { Schema, model } from 'mongoose'
+import { RoundEntity } from '../domain'
 
-const RoundSchema = new Schema<RoundEntity>({
+const RoundSchema = new Schema<RoundEntity>(
+  {
     uuid: String,
     result: { type: Number, default: -1 },
     start_date: String,
@@ -10,8 +11,10 @@ const RoundSchema = new Schema<RoundEntity>({
     gameUuid: { type: String, required: true },
     providerId: { type: String, required: true },
     identifierNumber: String,
-    open: { type: Boolean, default: true }
-}, { timestamps: true, versionKey: false });
+    open: { type: Boolean, default: true },
+  },
+  { timestamps: true, versionKey: false },
+)
 
-const RoundModel = model('round', RoundSchema);
-export default RoundModel;
+const RoundModel = model('round', RoundSchema)
+export default RoundModel

@@ -1,4 +1,4 @@
-import { RateHistory } from "./rateHistory.entity"
+import { RateHistory } from './rateHistory.entity'
 
 export interface CurrencyEntity {
   name: string

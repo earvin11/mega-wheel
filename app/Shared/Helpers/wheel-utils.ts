@@ -1,5 +1,7 @@
 import { BetEntity } from 'App/Bet/domain'
 import { initialPayments } from 'App/Bet/domain/Number'
+import { CurrencyEntity } from 'App/Currencies/domain/currency.entity'
+import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
 import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 
 interface Analysis {
@@ -63,4 +65,34 @@ export const getJackpot = (analysis: Analysis[]) => {
   const sortAnalysis = analysis.sort((a: Analysis, b: Analysis) => a.amount - b.amount)
 
   return sortAnalysis[0]
+}
+
+export const roundBetUpdater = (
+  roundBet: RoundBet,
+  bets: BetEntity[],
+  currencies: CurrencyEntity[],
+) => {
+  const auxRoundBet = roundBet
+  for (let i = 0; i < bets.length; i++) {
+    const currentBet = bets[i]
+    const { bet, currencyUuid } = currentBet
+    const filteredCurrency = currencies.find((c) => c.uuid === currencyUuid)
+    if (!filteredCurrency) {
+      console.log('Error currency no encontrado')
+      continue
+    }
+
+    bet.forEach((b) => {
+      const currentNumber = auxRoundBet.numbers.find((n) => n.number === b.number)
+      if (!currentNumber) {
+        console.log('Error Number bet not valid', b)
+        return
+      }
+
+      const newAmount = currentNumber?.amount + b.amount * filteredCurrency.usdRateChange
+      auxRoundBet.numbers[auxRoundBet.numbers.indexOf(currentNumber)].amount = newAmount
+    })
+  }
+
+  return auxRoundBet
 }
