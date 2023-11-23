@@ -1,7 +1,8 @@
 import { BetEntity } from 'App/Bet/domain'
-import { initialPayments } from 'App/Bet/domain/Number'
+import { initialPayments, multisAllowed } from 'App/Bet/domain/Number'
 import { CurrencyEntity } from 'App/Currencies/domain/currency.entity'
 import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
+import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
 import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 
 interface Analysis {
@@ -95,4 +96,31 @@ export const roundBetUpdater = (
   }
 
   return auxRoundBet
+}
+
+export const useAnalisysPosible = (roundBet: RoundBetEntity) => {
+  const { numbers } = roundBet
+
+  const completeAnalisys: any[] = []
+
+  for (let i = 0; i < numbers.length; i++) {
+    const currentNumber = numbers[i]
+    const { amount, number } = currentNumber
+
+    multisAllowed.forEach((mult) => {
+      const analysisObject = {
+        number,
+        naturalPay: amount * (number + 1),
+      }
+      if (mult > number) {
+        Object.assign(analysisObject, {
+          mult,
+          payWithMul: amount * (mult + 1),
+        })
+        completeAnalisys.push(analysisObject)
+      }
+    })
+  }
+
+  return completeAnalisys
 }

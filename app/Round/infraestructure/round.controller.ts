@@ -16,7 +16,7 @@ import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
 import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
 import BetModel from 'App/Bet/infraestructure/bet.model'
 import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
-import { roundBetUpdater } from 'App/Shared/Helpers/wheel-utils'
+import { roundBetUpdater, useAnalisysPosible } from 'App/Shared/Helpers/wheel-utils'
 import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
 
 export class RoundController {
@@ -182,8 +182,9 @@ export class RoundController {
     const roundBet = await RoundBetModel.findOne({ roundUuid: uuid }).exec()
     const bets = await BetModel.find({ roundUuid: uuid })
     const currencies = await CurrencyModel.find()
-    const { numbers } = roundBetUpdater(roundBet as RoundBet, bets, currencies)
-    const newRoundBet = this.roundBetUseCases.updateRoundBet(roundBet?.uuid as string, numbers)
-    response.ok({ round, roundBet, bets, currencies, newRoundBet })
+    // const { numbers } = roundBetUpdater(roundBet as RoundBet, bets, currencies)
+    // const newRoundBet = this.roundBetUseCases.updateRoundBet(roundBet?.uuid as string, numbers)
+    const completeAnalisys = useAnalisysPosible(roundBet as RoundBetEntity)
+    response.ok({ round, completeAnalisys })
   }
 }
