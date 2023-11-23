@@ -14,7 +14,6 @@ const ClientRoutes = () => {
   Route.get('/:uuid/available-games', clientController.getAvailableGamesInClient).middleware([
     'validateToken',
   ])
-  Route.get('/game/:gameUuid', clientController.getClientsByGame).middleware(['validateToken'])
   Route.put('/:uuid/add-currency', clientController.addCurrencyToClient).middleware([
     'validateToken',
   ])
