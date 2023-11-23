@@ -25,4 +25,14 @@ export class ChipUseCases {
     const chips = await this.chipRepository.getManyChips(chipsUuid)
     return chips
   }
+
+  public getChipsByOperator = async (operatorUuid: string, isoCode?: string) => {
+    const chips = await this.chipRepository.getChipsByOperator(operatorUuid, isoCode);
+    return chips;
+  }
+
+  public addDefaultChips = async (operatorUuid: string, isoCode: string) => {
+    const chips = await this.chipRepository.addDefaultChips(operatorUuid, isoCode);
+    return chips;
+  }
 }

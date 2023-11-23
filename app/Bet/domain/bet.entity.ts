@@ -4,7 +4,7 @@ export interface BetEntity {
   gameUuid: string
   playerUuid: string
   roundUuid: string
-  isPaid: boolean
+  isPaid?: boolean
   totalAmount: number
   currencyUuid: string
 }

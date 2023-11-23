@@ -5,6 +5,7 @@ import { CreateAuditoryParams } from '../../Shared/Interfaces/create-auditory.in
 import CreateAuditory from '../../Shared/Helpers/create-auditory'
 import { currencyUseCases } from '../../Currencies/infrastructure/dependencies'
 import { operatorUseCases } from '../../Operator/infrastructure/dependencies'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 
 export class ChipController {
   constructor(private chipUseCase: ChipUseCases) {}
@@ -64,6 +65,18 @@ export class ChipController {
       return response.status(200).json({ message: 'Fichas listadas!', chips })
     } catch (error) {
       return response.status(400).json({ error: 'No se pudo realizar la consulta!' })
+    }
+  }
+
+  public addDefaultChips = async ({ request, response }: HttpContextContract) => {
+    const { isoCode, operatorUuid } = request.body();
+    try {
+      const chips = await this.chipUseCase.addDefaultChips(operatorUuid, isoCode);
+
+      response.ok(chips);
+    } catch (error) {
+      console.log('ERROR CREANDO CHIPS POR DEFECTO -> ', error);
+      response.internalServerError({ error: 'Talk to administrator' });
     }
   }
 }

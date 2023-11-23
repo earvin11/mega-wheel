@@ -52,30 +52,29 @@ export class OperatorUseCases {
     return operators
   }
 
-  public assignChipsToOperator = async (uuid: string, chipUuid: string) => {
-    const operator = await this.operatorRepository.assignChipsToOperator(uuid, chipUuid)
-    return operator
-  }
+  // public assignChipsToOperator = async (uuid: string, chipUuid: string) => {
+  //   const operator = await this.operatorRepository.assignChipsToOperator(uuid, chipUuid)
+  //   return operator
+  // }
 
-  public showOperatorChips = this.getOperatorByUuid
+  // public showOperatorChips = this.getOperatorByUuid
 
-  public deleteChipInOperator = async (uuid: string, chipUuid: string) => {
-    const operator = await this.operatorRepository.deleteChipInOperator(uuid, chipUuid)
-    return operator
-  }
+  // public deleteChipInOperator = async (uuid: string, chipUuid: string) => {
+  //   const operator = await this.operatorRepository.deleteChipInOperator(uuid, chipUuid)
+  //   return operator
+  // }
 
-  public updateChip = async (uuid: string, chipUuid: string,newChip) => {
-    const operator = await this.operatorRepository.updateChip(uuid, chipUuid,newChip)
-    return operator
-  }
+  // public updateChip = async (uuid: string, chipUuid: string,newChip) => {
+  //   const operator = await this.operatorRepository.updateChip(uuid, chipUuid,newChip)
+  //   return operator
+  // }
 
-  public addDefaultChips = async (uuid: string, isoCode: string) => {
-    const operator = await this.operatorRepository.addDefaultChips(uuid, isoCode)
-    return operator
-  }
+  // public addDefaultChips = async (uuid: string, isoCode: string) => {
+  //   const operator = await this.operatorRepository.addDefaultChips(uuid, isoCode)
+  //   return operator
+  // }
 
   // CURRENCIES
-
   public addCurrencyToOperator = async (uuid: string, currency: string) => {
     const operator = await this.operatorRepository.addCurrencyToOperator(uuid, currency)
     return operator
@@ -104,9 +103,9 @@ export class OperatorUseCases {
       throw error;
     }
   }
-  public getGameAndLimitsInOperator = async (uuid: string, gameUuid: string): Promise<OperatorGameLimitsEntity | null> => {
+  public getGameAndLimitsInOperator = async ({ uuid, operator, gameUuid }:{uuid?: string; operator?: OperatorEntity; gameUuid: string}): Promise<OperatorGameLimitsEntity | null> => {
     try {
-      const operatorGameLimit = await this.operatorRepository.getGameAndLimitsInOperator(uuid, gameUuid);
+      const operatorGameLimit = await this.operatorRepository.getGameAndLimitsInOperator({ gameUuid, uuid, operator });
       return operatorGameLimit;
     } catch (error) {
       throw error;
@@ -123,5 +122,14 @@ export class OperatorUseCases {
     } catch (error) {
       throw error;
     };
+  }
+
+  public getGamesByCurrencyInOperator = async (uuid: string, isoCode: string): Promise<OperatorGameLimitsEntity[] | []> => {
+    try {
+      const games = await this.operatorRepository.getGamesByCurrencyInOperator(uuid, isoCode);
+      return games;
+    } catch (error) {
+      throw error;
+    }
   }
 }

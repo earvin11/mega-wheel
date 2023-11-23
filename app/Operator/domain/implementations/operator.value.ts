@@ -17,7 +17,7 @@ export class Operator implements OperatorEntity {
   public status: boolean;
   public uuid: string;
   public operatorId: number;
-  public chips: string[];
+  // public chips: string[];
   public currencies?: string[];
   public operatorGamesLimits?: OperatorGameLimitsEntity[];
 
@@ -36,7 +36,7 @@ export class Operator implements OperatorEntity {
     this.maxBet = operator.maxBet
     this.minBet = operator.minBet
     this.operatorId = operator.operatorId
-    this.chips = []
+    // this.chips = []
     this.currencies = operator.currencies
     this.operatorGamesLimits = operator.operatorGamesLimits
   }

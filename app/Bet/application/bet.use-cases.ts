@@ -46,4 +46,12 @@ export class BetUseCases {
       throw error
     }
   }
+  public instanceBet = (bet: BetEntity) => {
+    const newBet = new Bet(bet);
+    return newBet;
+  };
+  public saveBet = async (bet: BetEntity) => {
+    const betSaved = await this.betRepository.createBet(bet);
+    return betSaved;
+  };
 }

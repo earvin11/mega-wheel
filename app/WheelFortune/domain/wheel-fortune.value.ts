@@ -17,6 +17,7 @@ export class WheelForune implements WheelFortuneEntity {
   public logo: string;
   public language: string;
   public type: string;
+  public launchUrl: string;
 
   constructor(wheelFortune: WheelFortuneEntity) {
     const { uuid } = new GenerateId();
@@ -34,7 +35,8 @@ export class WheelForune implements WheelFortuneEntity {
     this.colorBackground = wheelFortune.colorBackground;
     this.logo = wheelFortune.logo;
     this.language = wheelFortune.language;
-    this.type = 'WHEEL'
+    this.type = 'WHEEL';
+    this.launchUrl = wheelFortune.launchUrl;
   }
 
 };

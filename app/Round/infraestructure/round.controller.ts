@@ -25,7 +25,7 @@ export class RoundController {
     private roundControlRedisUseCases: RoundControlRedisUseCases,
     private wheelUseCases: WheelFortuneUseCases,
     private roundBetUseCases: RoundBetUseCases,
-  ) {}
+  ) { }
 
   private changePhase = async (table: string, phase: Phase, io: any, timeWait?: number) => {
     await this.roundControlRedisUseCases.toPhase(table, phase)
@@ -80,6 +80,7 @@ export class RoundController {
         }),
       )
 
+      this.roundControlRedisUseCases.setGamesActive(games.map(({ uuid }) => uuid!))
       const betTime = games[0].betTime
 
       await this.changePhase(providerId, 'bet_time', SocketServer.io, betTime)
