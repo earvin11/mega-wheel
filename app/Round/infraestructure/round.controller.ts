@@ -16,7 +16,12 @@ import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
 import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
 import BetModel from 'App/Bet/infraestructure/bet.model'
 import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
-import { roundBetUpdater, useAnalisysPosible } from 'App/Shared/Helpers/wheel-utils'
+import {
+  roundBetUpdater,
+  useAnalisysPosible,
+  useJackpot,
+  useJackpotRandom,
+} from 'App/Shared/Helpers/wheel-utils'
 import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
 
 export class RoundController {
@@ -25,7 +30,7 @@ export class RoundController {
     private roundControlRedisUseCases: RoundControlRedisUseCases,
     private wheelUseCases: WheelFortuneUseCases,
     private roundBetUseCases: RoundBetUseCases,
-  ) { }
+  ) {}
 
   private changePhase = async (table: string, phase: Phase, io: any, timeWait?: number) => {
     await this.roundControlRedisUseCases.toPhase(table, phase)
@@ -186,6 +191,9 @@ export class RoundController {
     // const { numbers } = roundBetUpdater(roundBet as RoundBet, bets, currencies)
     // const newRoundBet = this.roundBetUseCases.updateRoundBet(roundBet?.uuid as string, numbers)
     const completeAnalisys = useAnalisysPosible(roundBet as RoundBetEntity)
-    response.ok({ round, completeAnalisys })
+
+    const jackpot = useJackpot(completeAnalisys, 95)
+    const jackpotRandom = useJackpotRandom(completeAnalisys, 95)
+    response.ok({ round, completeAnalisys, jackpot, jackpotRandom })
   }
 }

@@ -4,6 +4,7 @@ import { CurrencyEntity } from 'App/Currencies/domain/currency.entity'
 import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
 import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
 import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
+import { randomNumber } from './randomNumber'
 
 interface Analysis {
   number: number
@@ -97,11 +98,18 @@ export const roundBetUpdater = (
 
   return auxRoundBet
 }
+interface CompleteAnalisys {
+  number: number
+  naturalPay: number
+  mult: number
+  payWithMul: number
+  percentEarning: number
+  percentReturnToPlayer: number
+}
+export const useAnalisysPosible = (roundBet: RoundBetEntity): CompleteAnalisys[] => {
+  const { numbers, totalAmount } = roundBet
 
-export const useAnalisysPosible = (roundBet: RoundBetEntity) => {
-  const { numbers } = roundBet
-
-  const completeAnalisys: any[] = []
+  const completeAnalisys: CompleteAnalisys[] = []
 
   for (let i = 0; i < numbers.length; i++) {
     const currentNumber = numbers[i]
@@ -112,15 +120,57 @@ export const useAnalisysPosible = (roundBet: RoundBetEntity) => {
         number,
         naturalPay: amount * (number + 1),
       }
+      const payWithMul = amount * (mult + 1)
+      const percentEarning = ((totalAmount - payWithMul) / totalAmount) * 100
+      const percentReturnToPlayer = 100 - percentEarning
       if (mult > number) {
         Object.assign(analysisObject, {
           mult,
-          payWithMul: amount * (mult + 1),
+          payWithMul,
+          percentEarning,
+          percentReturnToPlayer,
         })
-        completeAnalisys.push(analysisObject)
+        completeAnalisys.push(analysisObject as CompleteAnalisys)
       }
     })
   }
 
   return completeAnalisys
+}
+
+export const useJackpotRandom = (
+  completeAnalisys: CompleteAnalisys[],
+  percentReturnToPlayer: number,
+): CompleteAnalisys => {
+  const multsValid = completeAnalisys.filter(
+    (c) => c.percentReturnToPlayer <= percentReturnToPlayer,
+  )
+  const mandatoryMult = completeAnalisys.sort(
+    (a: CompleteAnalisys, b: CompleteAnalisys) => a.percentReturnToPlayer - b.percentReturnToPlayer,
+  )[0]
+
+  if (!multsValid.length) {
+    return mandatoryMult
+  }
+  return multsValid[randomNumber(0, multsValid.length - 1)]
+}
+
+export const useJackpot = (
+  completeAnalisys: CompleteAnalisys[],
+  percentReturnToPlayer: number,
+): CompleteAnalisys => {
+  const multsValid = completeAnalisys
+    .filter((c) => c.percentReturnToPlayer <= percentReturnToPlayer)
+    .sort(
+      (a: CompleteAnalisys, b: CompleteAnalisys) =>
+        a.percentReturnToPlayer - b.percentReturnToPlayer,
+    )
+  const mandatoryMult = completeAnalisys.sort(
+    (a: CompleteAnalisys, b: CompleteAnalisys) => a.percentReturnToPlayer - b.percentReturnToPlayer,
+  )[0]
+
+  if (!multsValid.length) {
+    return mandatoryMult
+  }
+  return multsValid[0]
 }
