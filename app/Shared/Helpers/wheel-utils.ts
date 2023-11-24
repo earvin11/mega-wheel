@@ -276,3 +276,4 @@ export const payWinners = async (
       continue
     }
   }
+}

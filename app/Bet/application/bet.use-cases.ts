@@ -78,8 +78,6 @@ export class BetUseCases {
 
     await payWinners({ 
       bets: betsWinner,
-      //TODO:
-      isoCode: 'USD',
       result,
       roundId: roundUuid 
     });
