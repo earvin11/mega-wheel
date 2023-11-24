@@ -1,4 +1,4 @@
-import { CurrencyEntity } from "App/Currencies/domain/currency.entity";
+import { CurrencyEntity } from "../../../Currencies/domain/currency.entity";
 // import { GameEntity } from "App/Game/domain/game.entity";
 
 export interface OperatorGameLimitsEntity {

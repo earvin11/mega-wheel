@@ -87,13 +87,13 @@ export class LaunchController {
             const playerToRes = this.parseDocument(player!, 'player')
 
             response.ok({
-                minBet,
-                maxBet,
-                casino,
-                chips,
-                player: playerToRes,
-                operator: operatorToRes,
-                currency: currencyToRes,
+              minBet,
+              maxBet,
+              casino,
+              chips,
+              player: playerToRes,
+              operator: operatorToRes,
+              currency: currencyToRes,
             });
         } catch (error) {
             console.log('ERROR IN LAUNCH ->', error);

@@ -215,22 +215,22 @@ export class ClientController {
     }
   }
 
-  public getClientsByGame = async ({ request, response }) => {
-    const { gameUuid } = request.params()
+  // public getClientsByGame = async ({ request, response }) => {
+  //   const { gameUuid } = request.params()
 
-    try {
-      const gameExist = await gameUseCases.getGameByUuid(gameUuid)
-      if (!gameExist) return response.status(404).json({ error: 'No se encuentra el juego!' })
+  //   try {
+  //     const gameExist = await gameUseCases.getGameByUuid(gameUuid)
+  //     if (!gameExist) return response.status(404).json({ error: 'No se encuentra el juego!' })
 
-      const clients = await this.clientUseCases.getClientsByGame(gameUuid)
-      if (clients.length === 0)
-        return response.status(404).json({ error: 'No existen clientes asociados al juego!' })
+  //     const clients = await this.clientUseCases.getClientsByGame(gameUuid)
+  //     if (clients.length === 0)
+  //       return response.status(404).json({ error: 'No existen clientes asociados al juego!' })
 
-      return response.status(200).json({ message: 'Clientes listados!', clients })
-    } catch (error) {
-      return response.status(400).json({ error: 'No se pudo realizar la consulta!' })
-    }
-  }
+  //     return response.status(200).json({ message: 'Clientes listados!', clients })
+  //   } catch (error) {
+  //     return response.status(400).json({ error: 'No se pudo realizar la consulta!' })
+  //   }
+  // }
 
   public addCurrencyToClient = async (ctx: HttpContext) => {
     const { request, response } = ctx

@@ -1,4 +1,4 @@
-import { GenerateId } from 'App/Shared/Helpers/generate-id.helpers';
+import { GenerateId } from '../../Shared/Helpers/generate-id.helpers';
 import { BetBody, BetEntity } from './bet.entity';
 
 export class Bet implements BetEntity {

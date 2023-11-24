@@ -1,4 +1,4 @@
-import { GenerateId } from "App/Shared/Helpers/generate-id.helpers";
+import { GenerateId } from "../../Shared/Helpers/generate-id.helpers";
 import { WheelFortuneEntity } from "./wheel-fortune.entity";
 
 export class WheelForune implements WheelFortuneEntity {

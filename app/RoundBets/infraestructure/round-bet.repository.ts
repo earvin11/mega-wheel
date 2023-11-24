@@ -1,4 +1,4 @@
-import { BetBody } from 'App/Bet/domain'
+import { BetBody } from '../../Bet/domain'
 import { RoundBetRepository } from '../domain/repositories/roundBet-repository'
 import { RoundBetEntity } from '../domain/roundBet.entity'
 import RoundBetModel from './round-bets.model'

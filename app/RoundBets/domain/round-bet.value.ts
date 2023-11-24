@@ -1,6 +1,6 @@
-import { GenerateId } from 'App/Shared/Helpers/generate-id.helpers'
+import { GenerateId } from '../../Shared/Helpers/generate-id.helpers'
 import { RoundBetEntity } from './roundBet.entity'
-import { BetBody } from 'App/Bet/domain'
+import { BetBody } from '../../Bet/domain'
 
 export class RoundBet implements RoundBetEntity {
   public uuid: string

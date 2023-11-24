@@ -1,8 +1,15 @@
-import { BetEntity } from 'App/Bet/domain'
-import { initialPayments } from 'App/Bet/domain/Number'
-import { CurrencyEntity } from 'App/Currencies/domain/currency.entity'
-import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
-import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
+import Redis from '@ioc:Adonis/Addons/Redis'
+import { BetEntity } from '../../Bet/domain'
+import { initialPayments } from '../../Bet/domain/Number'
+import { CurrencyEntity } from '../../Currencies/domain/currency.entity'
+import { playerUseCases } from '../../Player/infraestructure/dependencies'
+import { RoundBet } from '../../RoundBets/domain/round-bet.value'
+import { CreditWalletRequest } from '../Interfaces/wallet.interfaces'
+import { sendCredit } from './wallet-request'
+import { betControlRedisRepository } from '../../Bet/infraestructure/dependencies'
+import { roundControlRedisRepository, roundUseCases } from '../../Round/infraestructure/dependencies'
+import { currencyUseCases } from 'App/Currencies/infrastructure/dependencies'
+// import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 
 interface Analysis {
   number: number
@@ -14,7 +21,7 @@ export const useWinnerFilter = (result: number) => {
 }
 
 export const getBetEarnings = (
-  wheelFortune: WheelFortuneEntity,
+  // wheelFortune: WheelFortuneEntity,
   bet: BetEntity,
   result: number,
 ) => {
@@ -95,4 +102,99 @@ export const roundBetUpdater = (
   }
 
   return auxRoundBet
+}
+
+export const getBetsWinnerByResult = (bets: BetEntity[], result: number): BetEntity[] => {
+  let betsWinner: BetEntity[] = [];
+
+  bets.forEach(( bet : BetEntity) => {
+    bet.bet.forEach( optionBet => {
+      if(optionBet.number === result) {
+        betsWinner.push(bet)
+      }
+    });
+  });
+
+  return betsWinner;
+};
+
+export const payBetsWinner = async (roundUuid: string) => {
+  const round = await roundUseCases.findRoundByUuid(roundUuid);
+  // const round = await roundControlRedisRepository.getRound(roundUuid);
+  if(!round || !round.result) return;
+
+  const { result } = round;
+
+  const bets = await betControlRedisRepository.getBetsByRound(roundUuid);
+  if(!bets.length) return;
+
+  const betsWinner = getBetsWinnerByResult(bets, result);
+  if(!betsWinner.length) return;
+
+  await payWinners({ 
+    bets: betsWinner,
+    result,
+    roundId: roundUuid 
+  });
+
+//   Redis.del(`round:${round.uuid}`)
+//   Redis.del(`bets:${round.uuid}`)
+}
+
+export const payWinners = async (
+  { bets, result, roundId }:
+  { bets: BetEntity[], result: number, roundId: string }
+) => {
+  for (let i = 0; i < bets.length; i++) {
+    const bet = bets[i];
+
+    const player = await playerUseCases.findByUuid(bet.playerUuid);
+    if(!player) return;
+
+    const currency = await currencyUseCases.getCurrencyByUuid(bet.currencyUuid);
+    if(!currency) return;
+
+    const earnings = getBetEarnings(bet, result);
+    if(!earnings) return;
+
+    const { earning } = earnings;
+
+    const dataWalletWin: CreditWalletRequest = {
+      user_id: player.userId,
+      round_id: roundId,
+      bet_id: String(bet._id!),
+      game_id: bet.gameUuid,
+      bet_code: bet.uuid!,
+      bet_date: bet.createdAt!,
+      amount: earning,
+      transactionType: 'win',
+      currency: currency.isoCode,
+      platform: '',
+    }
+    
+    try {
+      const { data } = await sendCredit(player.operator.endpointWin, dataWalletWin)
+      //TODO:
+      console.log({ wallet: data })
+      if (!data.ok) {
+        // await logUseCases.createLog({
+        //   typeError: TypesLogsErrors.credit,
+        //   request: dataWalletWin,
+        //   response: data,
+        //   error: data.msg,
+        //   player: bet.player,
+        // })
+        console.log({ wallet: 'Error in wallet', data })
+      }
+    } catch (error) {
+      console.log('ERROR CREDITO -> ', error)
+      // await logUseCases.createLog({
+      //   typeError: TypesLogsErrors.credit,
+      //   request: dataWalletWin,
+      //   response: error,
+      //   player: bet.player,
+      // })
+      continue
+    }
+  }
 }

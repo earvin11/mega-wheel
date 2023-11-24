@@ -18,7 +18,8 @@ export class WheelFortuneController {
         language,
         logo,
         providerId,
-        urlTransmision
+        urlTransmision,
+        launchUrl
       } = request.body();
 
 
@@ -32,7 +33,8 @@ export class WheelFortuneController {
         language,
         logo,
         providerId,
-        urlTransmision
+        urlTransmision,
+        launchUrl,
       });
 
       response.created(newWheel);

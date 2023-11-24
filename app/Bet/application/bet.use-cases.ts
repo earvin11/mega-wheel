@@ -1,7 +1,15 @@
+import { getBetsWinnerByResult, payWinners } from '../../Shared/Helpers/wheel-utils';
 import { Bet, BetEntity, BetRepository } from '../domain'
+import { BetControlRedisRepository } from '../infraestructure/repositories/bet-control.redis-repository';
+import { RoundControlRedisRepository } from '../../Round/infraestructure/repositories/round.control.redis.repository';
+import Redis from '@ioc:Adonis/Addons/Redis';
 
 export class BetUseCases {
-  constructor(private readonly betRepository: BetRepository) {}
+  constructor(
+    private readonly betRepository: BetRepository,
+    private readonly betControlRedisRepository: BetControlRedisRepository,
+    private readonly roundControlRedisRepository: RoundControlRedisRepository
+  ) {}
 
   public createBet = async (bet: BetEntity) => {
     try {
@@ -54,4 +62,29 @@ export class BetUseCases {
     const betSaved = await this.betRepository.createBet(bet);
     return betSaved;
   };
+  
+  // PAY-BETS
+  public payBetsWinner = async (roundUuid: string) => {
+    const round = await this.roundControlRedisRepository.getRound(roundUuid);
+    if(!round || !round.result) return;
+
+    const { result } = round;
+
+    const bets = await this.betControlRedisRepository.getBetsByRound(roundUuid);
+    if(!bets.length) return;
+
+    const betsWinner = getBetsWinnerByResult(bets, result);
+    if(!betsWinner.length) return;
+
+    await payWinners({ 
+      bets: betsWinner,
+      //TODO:
+      isoCode: 'USD',
+      result,
+      roundId: roundUuid 
+    });
+
+    Redis.del(`round:${round.uuid}`)
+    Redis.del(`bets:${round.uuid}`)
+  }
 }

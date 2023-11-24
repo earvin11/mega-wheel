@@ -1,7 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import { operatorUseCases } from './dependencies';
-import { gameUseCases } from 'App/Game/infrastructure/dependencies';
+import { gameUseCases } from '../../Game/infrastructure/dependencies';
 
 export default class verifyOperatorGameMiddleware {
   public handle = async ({ request, response }: HttpContextContract, next: () => Promise<void>) => {
