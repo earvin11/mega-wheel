@@ -21,6 +21,7 @@ const WheelSchema = new Schema<WheelFortuneEntity>(
       type: String,
       default: 'WHEEL',
     },
+    percentReturnToPlayer: { type: Number, default: 95 },
   },
   { versionKey: false, timestamps: true },
 )

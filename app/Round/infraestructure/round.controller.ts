@@ -11,16 +11,19 @@ import { Phase, RoundEntity } from '../domain'
 import Logger from '@ioc:Adonis/Core/Logger'
 import { GenerateJWT } from '../../Shared/Helpers/generate-jwt'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { RoundBetUseCases } from '../../RoundBets/application/round-bet-use-case'
-import { RoundBetEntity } from '../../RoundBets/domain/roundBet.entity'
-import RoundBetModel from '../../RoundBets/infraestructure/round-bets.model'
-import BetModel from '../../Bet/infraestructure/bet.model'
-import CurrencyModel from '../../Currencies/infrastructure/currency.model'
-import { payBetsWinner, roundBetUpdater } from '../../Shared/Helpers/wheel-utils'
-import { RoundBet } from '../../RoundBets/domain/round-bet.value'
-
-import { Worker } from 'worker_threads'
-const worker = new Worker('./app/Shared/Services/Worker')
+import { RoundBetUseCases } from 'App/RoundBets/application/round-bet-use-case'
+import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
+import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
+import BetModel from 'App/Bet/infraestructure/bet.model'
+import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
+import {
+  payBetsWinner,
+  roundBetUpdater,
+  useAnalisysPosible,
+  useJackpot,
+  useJackpotRandom,
+} from 'App/Shared/Helpers/wheel-utils'
+import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
 
 export class RoundController {
   constructor(
@@ -28,7 +31,7 @@ export class RoundController {
     private roundControlRedisUseCases: RoundControlRedisUseCases,
     private wheelUseCases: WheelFortuneUseCases,
     private roundBetUseCases: RoundBetUseCases,
-  ) { }
+  ) {}
 
   private changePhase = async (table: string, phase: Phase, io: any, timeWait?: number) => {
     await this.roundControlRedisUseCases.toPhase(table, phase)
@@ -194,8 +197,12 @@ export class RoundController {
     const roundBet = await RoundBetModel.findOne({ roundUuid: uuid }).exec()
     const bets = await BetModel.find({ roundUuid: uuid })
     const currencies = await CurrencyModel.find()
-    const { numbers } = roundBetUpdater(roundBet as RoundBet, bets, currencies)
-    const newRoundBet = this.roundBetUseCases.updateRoundBet(roundBet?.uuid as string, numbers)
-    response.ok({ round, roundBet, bets, currencies, newRoundBet })
+    // const { numbers } = roundBetUpdater(roundBet as RoundBet, bets, currencies)
+    // const newRoundBet = this.roundBetUseCases.updateRoundBet(roundBet?.uuid as string, numbers)
+    const completeAnalisys = useAnalisysPosible(roundBet as RoundBetEntity)
+
+    const jackpot = useJackpot(completeAnalisys, 95)
+    const jackpotRandom = useJackpotRandom(completeAnalisys, 95)
+    response.ok({ round, completeAnalisys, jackpot, jackpotRandom })
   }
 }

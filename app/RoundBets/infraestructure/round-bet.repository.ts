@@ -9,9 +9,13 @@ export class RoundBetMongoRepository implements RoundBetRepository {
     return newRoundBet
   }
   public async updateRoundBet(uuid: string, numbers: BetBody[]): Promise<RoundBetEntity | null> {
+    let totalAmount = 0
+    numbers.forEach((n) => {
+      totalAmount += n.amount
+    })
     const roundBet = await RoundBetModel.findOneAndUpdate(
       { uuid },
-      { numbers },
+      { numbers, totalAmount },
       {
         new: true,
       },

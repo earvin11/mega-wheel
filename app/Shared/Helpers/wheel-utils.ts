@@ -1,6 +1,5 @@
 import Redis from '@ioc:Adonis/Addons/Redis'
 import { BetEntity } from '../../Bet/domain'
-import { initialPayments } from '../../Bet/domain/Number'
 import { CurrencyEntity } from '../../Currencies/domain/currency.entity'
 import { playerUseCases } from '../../Player/infraestructure/dependencies'
 import { RoundBet } from '../../RoundBets/domain/round-bet.value'
@@ -9,6 +8,10 @@ import { sendCredit } from './wallet-request'
 import { betControlRedisRepository } from '../../Bet/infraestructure/dependencies'
 import { roundControlRedisRepository, roundUseCases } from '../../Round/infraestructure/dependencies'
 import { currencyUseCases } from 'App/Currencies/infrastructure/dependencies'
+import { initialPayments, multisAllowed } from 'App/Bet/domain/Number'
+import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
+import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
+import { randomNumber } from './randomNumber'
 // import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 
 interface Analysis {
@@ -102,6 +105,82 @@ export const roundBetUpdater = (
   }
 
   return auxRoundBet
+}
+interface CompleteAnalisys {
+  number: number
+  naturalPay: number
+  mult: number
+  payWithMul: number
+  percentEarning: number
+  percentReturnToPlayer: number
+}
+export const useAnalisysPosible = (roundBet: RoundBetEntity): CompleteAnalisys[] => {
+  const { numbers, totalAmount } = roundBet
+
+  const completeAnalisys: CompleteAnalisys[] = []
+
+  for (let i = 0; i < numbers.length; i++) {
+    const currentNumber = numbers[i]
+    const { amount, number } = currentNumber
+
+    multisAllowed.forEach((mult) => {
+      const analysisObject = {
+        number,
+        naturalPay: amount * (number + 1),
+      }
+      const payWithMul = amount * (mult + 1)
+      const percentEarning = ((totalAmount - payWithMul) / totalAmount) * 100
+      const percentReturnToPlayer = 100 - percentEarning
+      if (mult > number) {
+        Object.assign(analysisObject, {
+          mult,
+          payWithMul,
+          percentEarning,
+          percentReturnToPlayer,
+        })
+        completeAnalisys.push(analysisObject as CompleteAnalisys)
+      }
+    })
+  }
+
+  return completeAnalisys
+}
+
+export const useJackpotRandom = (
+  completeAnalisys: CompleteAnalisys[],
+  percentReturnToPlayer: number,
+): CompleteAnalisys => {
+  const multsValid = completeAnalisys.filter(
+    (c) => c.percentReturnToPlayer <= percentReturnToPlayer,
+  )
+  const mandatoryMult = completeAnalisys.sort(
+    (a: CompleteAnalisys, b: CompleteAnalisys) => a.percentReturnToPlayer - b.percentReturnToPlayer,
+  )[0]
+
+  if (!multsValid.length) {
+    return mandatoryMult
+  }
+  return multsValid[randomNumber(0, multsValid.length - 1)]
+}
+
+export const useJackpot = (
+  completeAnalisys: CompleteAnalisys[],
+  percentReturnToPlayer: number,
+): CompleteAnalisys => {
+  const multsValid = completeAnalisys
+    .filter((c) => c.percentReturnToPlayer <= percentReturnToPlayer)
+    .sort(
+      (a: CompleteAnalisys, b: CompleteAnalisys) =>
+        a.percentReturnToPlayer - b.percentReturnToPlayer,
+    )
+  const mandatoryMult = completeAnalisys.sort(
+    (a: CompleteAnalisys, b: CompleteAnalisys) => a.percentReturnToPlayer - b.percentReturnToPlayer,
+  )[0]
+
+  if (!multsValid.length) {
+    return mandatoryMult
+  }
+  return multsValid[0]
 }
 
 export const getBetsWinnerByResult = (bets: BetEntity[], result: number): BetEntity[] => {
@@ -197,4 +276,3 @@ export const payWinners = async (
       continue
     }
   }
-}

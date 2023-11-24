@@ -8,15 +8,19 @@ export interface WheelFortuneEntity {
   croupier?: string // croupiers uuid
 
   // !Note: Add game logic properties here
-  betTime: number;
-  jackpot: boolean;
-  imgBackgrout: string;
-  urlTransmision: string;
-  colorBackground: string;
-  logo: string;
-  language: string;
-  type?: string;
-  launchUrl: string;
-};
+  betTime: number
+  jackpot: boolean
+  imgBackgrout: string
+  urlTransmision: string
+  colorBackground: string
+  logo: string
+  language: string
+  type?: string
+  launchUrl: string
+  percentReturnToPlayer: number
+}
 
-export type UpdateWheelDto = Pick<WheelFortuneEntity, 'imgBackgrout' | 'providerId' | 'urlTransmision'>;
+export type UpdateWheelDto = Pick<
+  WheelFortuneEntity,
+  'imgBackgrout' | 'providerId' | 'urlTransmision'
+>
