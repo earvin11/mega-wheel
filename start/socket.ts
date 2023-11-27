@@ -127,7 +127,7 @@ Ws.io.on('connection', async (socket) => {
         playerUuid: player,
         roundUuid: roundId,
         totalAmount,
-        currencyUuid: currency,
+        currencyUuid: currencyData.uuid,
         gameUuid,
       }
 

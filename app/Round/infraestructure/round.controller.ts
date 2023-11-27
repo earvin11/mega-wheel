@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { Worker } from 'worker_threads'
 import { HttpContext } from '@adonisjs/core/build/standalone'
 import { RoundUseCases } from '../application/round.use-cases'
 import Redis from '@ioc:Adonis/Addons/Redis'
@@ -17,13 +18,12 @@ import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
 import BetModel from 'App/Bet/infraestructure/bet.model'
 import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
 import {
-  payBetsWinner,
-  roundBetUpdater,
   useAnalisysPosible,
   useJackpot,
   useJackpotRandom,
 } from 'App/Shared/Helpers/wheel-utils'
-import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
+
+const worker = new Worker('./app/Shared/Services/Worker');
 
 export class RoundController {
   constructor(
@@ -162,28 +162,27 @@ export class RoundController {
             result,
           })
 
-          // Redis.del(`round:${round.uuid}`)
-          // Redis.del(`bets:${round.uuid}`)
+          Redis.del(`round:${round.uuid}`)
+          Redis.del(`bets:${round.uuid}`)
 
-          // worker.postMessage({
-          //   cmd: 'pay-winners',
-          //   winnersData: {
-          //     roundUuid: round.uuid
-          //   },
-          // })
-          await payBetsWinner(round.uuid)
-          return
+          worker.postMessage({
+            cmd: 'pay-winners',
+            winnersData: {
+              roundUuid: round.uuid
+            },
+          })
+          return;
         }),
       )
 
       await this.changePhase(providerId, 'processing_next_round', SocketServer.io)
       Redis.publish(END_GAME_PUB_SUB, providerId)
 
-      // const token = await GenerateJWT(user.uuid, user.userName)
+      const token = await GenerateJWT(user.uuid, user.userName)
 
       response.ok({
         ok: true,
-        // token,
+        token,
       })
     } catch (error) {
       console.log('ERROR RESULT ROUND -> ', error)
