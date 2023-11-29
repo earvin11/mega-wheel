@@ -122,13 +122,14 @@ Ws.io.on('connection', async (socket) => {
         return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, { message: 'PLayer not found or disabled' })
 
       const totalAmount = calculateAmountBet(bet)
-      const dataBet = {
+      const dataBet: BetEntity = {
         bet,
         playerUuid: player,
         roundUuid: roundId,
         totalAmount,
-        currencyUuid: currencyData.uuid,
-        gameUuid,
+        currencyUuid: currencyData.uuid!,
+        gameUuid: game.uuid!,
+        currencyIsoCode: currencyData.isoCode
       }
 
       // Instanciar apuesta
@@ -144,7 +145,7 @@ Ws.io.on('connection', async (socket) => {
         bet_code: createBet.uuid!,
         bet_date: String(new Date()),
         platform: String(platform),
-        currency: String(currency),
+        currency: currencyData.isoCode,
         transactionType: 'bet',
       }
 
