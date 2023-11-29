@@ -56,7 +56,7 @@ export class RoundController {
       if (phase !== 'processing_next_round')
         return this.changePhase(providerId, phase, SocketServer.io)
 
-      const games = await this.wheelUseCases.getManyBryProviderId(providerId)
+      const games = await this.wheelUseCases.getManyByProviderId(providerId)
 
       if (!games || !games.length) return
 
