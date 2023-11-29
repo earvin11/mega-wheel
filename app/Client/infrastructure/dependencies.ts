@@ -1,7 +1,4 @@
-import { ClientMongoRepository } from './client.repository'
-import { ClientUseCases } from '../application/ClientUseCases'
+import { clientUseCases } from 'App/Operator/infrastructure/dependencies'
 import { ClientController } from './client.controller'
 
-export const clientMongoRepository = new ClientMongoRepository()
-export const clientUseCases = new ClientUseCases(clientMongoRepository)
 export const clientController = new ClientController(clientUseCases)

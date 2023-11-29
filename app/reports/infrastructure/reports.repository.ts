@@ -3,14 +3,12 @@ import { FilterReportInterface, RoundReportEnitity } from '../domain/reports.ent
 import { ReportsRepository } from '../domain/reports.repository'
 // import { CurrencyEntity } from '../../Currencies/domain/currency.entity'
 //USE CASES
-import { clientUseCases } from '../../Client/infrastructure/dependencies'
 import { OperatorUseCases } from '../../Operator/application/OperatorUseCases'
+import { clientUseCases } from 'App/Operator/infrastructure/dependencies'
 import RoundModel from 'App/Round/infraestructure/round.model'
-import { FormatDate } from 'App/Shared/Helpers/formate-date'
-// import CurrencyModel from '../../Currencies/infrastructure/currency.model'
-
-//FUNCTIONS
 // import OperatorModel from 'App/Operator/infrastructure/operator.model'
+//FUNCTIONS
+import { FormatDate } from 'App/Shared/Helpers/formate-date'
 
 export class ReportsMongoRepository implements ReportsRepository {
   constructor(private operatorUseCases: OperatorUseCases) { }
@@ -60,6 +58,7 @@ export class ReportsMongoRepository implements ReportsRepository {
 
         games.push(...operatorGames)
       }
+      games.push('X')
     }
 
     filter['game.uuid'] = {
