@@ -7,6 +7,8 @@ import PlayerModel from "../../Player/infraestructure/player.model";
 // import CurrencyModel from "../../Currencies/infrastructure/currency.model";
 import { WheelFortuneEntity } from "App/WheelFortune/domain/wheel-fortune.entity";
 import GameModel from "../../WheelFortune/infraestructure/wheelFortune.model";
+import { logUseCases } from "../../Log/infrastructure/dependencies";
+import { TypesLogsErrors } from "../../Log/domain/log.entity";
 
 const getBetEarnings = (
     wheelFortune: WheelFortuneEntity,
@@ -104,26 +106,24 @@ export const payWinners = async (
         
         try {
         const { data } = await sendCredit(player.operator.endpointWin, dataWalletWin)
-            //TODO:
-            console.log({ wallet: data })
             if (!data.ok) {
-                // await logUseCases.createLog({
-                //   typeError: TypesLogsErrors.credit,
-                //   request: dataWalletWin,
-                //   response: data,
-                //   error: data.msg,
-                //   player: bet.player,
-                // })
+                await logUseCases.createLog({
+                  typeError: TypesLogsErrors.credit,
+                  request: dataWalletWin,
+                  response: data,
+                  error: data.msg,
+                  player: bet.playerUuid,
+                })
                 console.log({ wallet: 'Error in wallet', data })
             }
         } catch (error) {
             console.log('ERROR CREDITO -> ', error)
-            // await logUseCases.createLog({
-            //   typeError: TypesLogsErrors.credit,
-            //   request: dataWalletWin,
-            //   response: error,
-            //   player: bet.player,
-            // })
+            await logUseCases.createLog({
+              typeError: TypesLogsErrors.credit,
+              request: dataWalletWin,
+              response: error,
+              player: bet.playerUuid,
+            })
             continue
         }
     }
