@@ -84,7 +84,6 @@ export class RoundController {
             })
         }),
       )
-
       this.roundControlRedisUseCases.setGamesActive(games.map(({ uuid }) => uuid!))
       const betTime = games[0].betTime
 
@@ -106,10 +105,10 @@ export class RoundController {
 
       await this.updateRoundRedis(roundsWithJackpot)
 
-      rounds.map((round) => {
+      rounds.forEach((round) => {
         SocketServer.io.to(`${round.gameUuid!}`).emit('jackpot', {
           msg: 'Jackpot',
-          jackpot: { multiplier: 10, number: 20 },
+          jackpot: round.jackpot,
         })
       })
 

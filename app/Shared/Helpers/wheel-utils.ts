@@ -25,7 +25,6 @@ export const getBetEarnings = (
   const { bet: betData } = bet
   const winnerNumber = betData.find((b) => b.number === result)
   const payment = wheelFortune.betPays.find((b) => b.number === result)
-  // const payment = initialPayments.find((b) => b.number === result)
   if (!winnerNumber || !payment) {
     console.log('winner or payment  no encontrado')
     return
@@ -181,5 +180,3 @@ export const useJackpot = (
   }
   return multsValid[0]
 }
-
-

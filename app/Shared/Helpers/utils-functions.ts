@@ -9,13 +9,13 @@ import { CurrencyEntity } from '../../Currencies/domain/currency.entity'
 // import { betUseCases } from '../../Bet/infraestructure/dependencies';
 
 export const calculateAmountBet = (bet: BetBody[]): number => {
-    let totalAmount: number = 0
-    bet.forEach(betBody => {
-        totalAmount += betBody.amount
-    });
-    return totalAmount
+  let totalAmount: number = 0
+  bet.forEach((betBody) => {
+    totalAmount += betBody.amount
+  })
+  return totalAmount
 }
-  
+
 export const exchangeCurrencyByDollar = (currency: CurrencyEntity): number => {
   if (!currency.exchangeRateHistory) return 0
   const lastIndex = currency.exchangeRateHistory.length - 1
@@ -39,18 +39,18 @@ export const addHoursToTime = (date: Date, countHours: number): Date => {
 }
 
 export const getBetsWinnerByResult = (bets: BetEntity[], result: number): BetEntity[] => {
-  let betsWinner: BetEntity[] = [];
+  let betsWinner: BetEntity[] = []
 
-  bets.forEach(( bet : BetEntity) => {
-    bet.bet.forEach( optionBet => {
-      if(optionBet.number === result) {
+  bets.forEach((bet: BetEntity) => {
+    bet.bet.forEach((optionBet) => {
+      if (optionBet.number === result) {
         betsWinner.push(bet)
       }
-    });
-  });
+    })
+  })
 
-  return betsWinner;
-};
+  return betsWinner
+}
 
 // export const payBetsWinner = async (roundUuid: string) => {
 //   const round = await roundUseCases.findRoundByUuid(roundUuid);
@@ -66,10 +66,10 @@ export const getBetsWinnerByResult = (bets: BetEntity[], result: number): BetEnt
 //   const betsWinner = getBetsWinnerByResult(bets, result);
 //   if(!betsWinner.length) return;
 
-//   await payWinners({ 
+//   await payWinners({
 //     bets: betsWinner,
 //     result,
-//     roundId: roundUuid 
+//     roundId: roundUuid
 //   });
 
 // //   Redis.del(`round:${round.uuid}`)
@@ -106,7 +106,7 @@ export const getBetsWinnerByResult = (bets: BetEntity[], result: number): BetEnt
 //       currency: currency.isoCode,
 //       platform: '',
 //     }
-    
+
 //     try {
 //       const { data } = await sendCredit(player.operator.endpointWin, dataWalletWin)
 //       //TODO:
