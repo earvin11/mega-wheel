@@ -20,7 +20,7 @@ export class LaunchController {
     ) {}
 
     public launch = async ({ request, response }: HttpContextContract) => {
-        const { token, operatorUuid, casinoId, casinoToken } = request.body();
+        const { token, operatorUuid, casinoId, /*casinoToken*/ } = request.body();
         try {
             // Validar operador
             const operator = await this.operatorUseCases.getOperatorByUuid(operatorUuid)

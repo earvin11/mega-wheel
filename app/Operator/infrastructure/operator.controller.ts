@@ -6,7 +6,6 @@ import CreateAuditory from '../../Shared/Helpers/create-auditory'
 import { OperatorUrlEntity } from '../domain/entities/operatorUrl.entity'
 import { UpdateOperatorEntity } from '../domain/entities/updateOperator.entity'
 import { CurrencyUseCases } from '../../Currencies/application/currencyUseCases'
-import { ChipUseCases } from '../../Chip/application/ChipUseCase'
 import { ClientUseCases } from '../../Client/application/ClientUseCases'
 import { CurrencyAndLimitsEntity } from '../domain/entities'
 import { WheelFortuneUseCases } from '../../WheelFortune/apllication/wheel-fortune.use-cases'
@@ -18,7 +17,6 @@ export class OperatorController {
     private clientUseCases: ClientUseCases,
     private gameUseCases: WheelFortuneUseCases,
     private currencyUseCases: CurrencyUseCases,
-    private chipUseCases: ChipUseCases,
   ) {}
 
   public createOperator = async (ctx: HttpContext) => {

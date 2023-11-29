@@ -84,9 +84,9 @@ Ws.io.on('connection', async (socket) => {
       user_id,
       round: roundId,
       platform,
-      plaerCountry,
-      player_ip,
-      userAgent,
+      // plaerCountry,
+      // player_ip,
+      // userAgent,
     } = betData
 
     try {

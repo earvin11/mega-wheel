@@ -16,7 +16,7 @@ export class BetController {
   public createBet = async (ctx: HttpContext) => {
     const { request, response } = ctx
 
-    const providerId = request.body().providerId
+    // const providerId = request.body().providerId
     const bet = { ...request.body() }
 
     try {

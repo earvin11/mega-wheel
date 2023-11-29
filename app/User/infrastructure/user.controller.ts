@@ -6,8 +6,7 @@ import CreateAuditory from 'App/Shared/Helpers/create-auditory'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { UpdateUserEntity } from '../domain/updateUser.entity'
 import { UserEntity } from '../domain/user.entity'
-import { clientUseCases } from '../../Client/infrastructure/dependencies'
-import { operatorUseCases } from '../../Operator/infrastructure/dependencies'
+import { clientUseCases, operatorUseCases } from '../../Operator/infrastructure/dependencies'
 
 export class UserController {
   constructor(private userUseCase: UserUseCase) {}

@@ -19,7 +19,8 @@ export class WheelFortuneController {
         logo,
         providerId,
         urlTransmision,
-        launchUrl
+        launchUrl,
+        percentReturnToPlayer
       } = request.body();
 
 
@@ -35,6 +36,7 @@ export class WheelFortuneController {
         providerId,
         urlTransmision,
         launchUrl,
+        percentReturnToPlayer
       });
 
       response.created(newWheel);

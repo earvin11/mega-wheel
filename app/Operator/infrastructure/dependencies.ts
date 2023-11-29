@@ -3,7 +3,6 @@ import { OperatorUseCases } from '../application/OperatorUseCases'
 import { OperatorController } from './operator.controller'
 import { OperatorMongoRepository } from './operator.repository'
 import { currencyUseCases } from '../../Currencies/infrastructure/dependencies'
-import { chipUseCases } from '../../Chip/infrastructure/dependencies'
 import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies'
 import { ClientUseCases } from '../../Client/application/ClientUseCases'
 import { ClientMongoRepository } from '../../Client/infrastructure/client.repository'
@@ -19,7 +18,6 @@ const operatorController = new OperatorController(
     clientUseCases,
     wheelFortuneUseCases,
     currencyUseCases,
-    chipUseCases,
 );
 
 export default operatorController

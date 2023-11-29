@@ -13,7 +13,6 @@ export default class verifyOperatorGameMiddleware {
       const operator = await operatorUseCases.getOperatorByUuid(uuid);
       if (!operator) return response.status(400).json({ error: 'Operador no encontrado!' })
       
-      if (!operator.games?.includes(gameUuid)) return response.status(400).json({ error: 'El operador no tiene el juego asignado' });
 
       const game = await gameUseCases.getGameByUuid(gameUuid);
       if (!game) return response.status(400).json({ error: 'El juego no existe' });
