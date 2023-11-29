@@ -1,5 +1,5 @@
-import { GenerateId } from "../../Shared/Helpers/generate-id.helpers";
-import { BetPay, WheelFortuneEntity } from "./wheel-fortune.entity";
+import { GenerateId } from '../../Shared/Helpers/generate-id.helpers'
+import { BetPay, WheelFortuneEntity } from './wheel-fortune.entity'
 
 export class WheelForune implements WheelFortuneEntity {
   public name: string
@@ -19,8 +19,7 @@ export class WheelForune implements WheelFortuneEntity {
   public type: string
   public launchUrl: string
   public percentReturnToPlayer: number
-  public betOptions: number[];
-  public betPays: BetPay[];
+  public betPays: BetPay[]
 
   constructor(wheelFortune: WheelFortuneEntity) {
     const { uuid } = new GenerateId()
@@ -41,8 +40,6 @@ export class WheelForune implements WheelFortuneEntity {
     this.type = 'WHEEL'
     this.launchUrl = wheelFortune.launchUrl
     this.percentReturnToPlayer = wheelFortune.percentReturnToPlayer
-    this.betOptions = wheelFortune.betOptions
     this.betPays = wheelFortune.betPays
   }
-  
 }

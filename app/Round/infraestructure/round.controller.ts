@@ -23,7 +23,7 @@ import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
 //   useJackpotRandom,
 // } from 'App/Shared/Helpers/wheel-utils'
 
-const worker = new Worker('./app/Shared/Services/Worker');
+const worker = new Worker('./app/Shared/Services/Worker')
 
 export class RoundController {
   constructor(
@@ -84,7 +84,6 @@ export class RoundController {
             })
         }),
       )
-
       this.roundControlRedisUseCases.setGamesActive(games.map(({ uuid }) => uuid!))
       const betTime = games[0].betTime
 
@@ -106,10 +105,10 @@ export class RoundController {
 
       await this.updateRoundRedis(roundsWithJackpot)
 
-      rounds.map((round) => {
+      rounds.forEach((round) => {
         SocketServer.io.to(`${round.gameUuid!}`).emit('jackpot', {
           msg: 'Jackpot',
-          jackpot: { multiplier: 10, number: 20 },
+          jackpot: round.jackpot,
         })
       })
 
@@ -156,7 +155,7 @@ export class RoundController {
       await Promise.all(rounds.map((round) => this.roundUseCases.closeRound(round.uuid, result)))
 
       await Promise.all(
-        rounds.map(async(round) => {
+        rounds.map(async (round) => {
           SocketServer.io.to(`${round.gameUuid}`).emit('round:end', {
             msg: 'Round result',
             result,
@@ -168,10 +167,10 @@ export class RoundController {
           worker.postMessage({
             cmd: 'pay-winners',
             winnersData: {
-              roundUuid: round.uuid
+              roundUuid: round.uuid,
             },
           })
-          return;
+          return
         }),
       )
 

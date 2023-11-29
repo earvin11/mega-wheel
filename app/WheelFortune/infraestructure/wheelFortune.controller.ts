@@ -1,10 +1,8 @@
-import { HttpContext } from "@adonisjs/core/build/standalone";
-import { WheelFortuneUseCases } from "../apllication/wheel-fortune.use-cases";
+import { HttpContext } from '@adonisjs/core/build/standalone'
+import { WheelFortuneUseCases } from '../apllication/wheel-fortune.use-cases'
 
 export class WheelFortuneController {
-  constructor(
-    private wheelUseCases: WheelFortuneUseCases,
-  ) { }
+  constructor(private wheelUseCases: WheelFortuneUseCases) {}
 
   public create = async ({ request, response }: HttpContext) => {
     try {
@@ -21,9 +19,8 @@ export class WheelFortuneController {
         urlTransmision,
         launchUrl,
         percentReturnToPlayer,
-        betOptions,
         betPays,
-      } = request.body();
+      } = request.body()
 
       const newWheel = await this.wheelUseCases.create({
         name,
@@ -38,14 +35,12 @@ export class WheelFortuneController {
         urlTransmision,
         launchUrl,
         percentReturnToPlayer,
-        betOptions,
         betPays,
-      });
+      })
 
-      response.created(newWheel);
+      response.created(newWheel)
     } catch (error) {
-      response.internalServerError({ error: 'Talk to administrator' });
+      response.internalServerError({ error: 'Talk to administrator' })
     }
   }
-
-};
+}

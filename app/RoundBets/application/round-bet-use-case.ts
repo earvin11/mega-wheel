@@ -13,6 +13,7 @@ export class RoundBetUseCases {
       const newRoundBet = new RoundBet({
         roundUuid,
         numbers: numbers.map((n) => ({ number: n, amount: 0 })),
+        totalAmount: 0,
       })
       const roundBet = await this.roundBetRepository.createRoundBet(newRoundBet)
       return roundBet

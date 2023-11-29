@@ -18,7 +18,6 @@ export interface WheelFortuneEntity {
   type?: string
   launchUrl: string
   percentReturnToPlayer: number
-  betOptions: number[]
   betPays: BetPay[]
 }
 

@@ -8,17 +8,16 @@ export default class ProductRequest {
       providerId: schema.string(),
       betTime: schema.number(),
       launchUrl: schema.string(),
-      betOptions: schema.array().members(schema.number()),
-      betPays: schema.array().anyMembers()
-    });
-  
+      betPays: schema.array().anyMembers(),
+    })
+
     try {
       await request.validate({
-        schema: wheelSchema
-      });
-      await next();
+        schema: wheelSchema,
+      })
+      await next()
     } catch (error) {
-      response.badRequest(error.messages);
+      response.badRequest(error.messages)
     }
   }
 }
