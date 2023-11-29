@@ -5,6 +5,7 @@ import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
 import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
 import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 import { randomNumber } from './randomNumber'
+import { Jackpot } from 'App/Round/domain'
 
 interface Analysis {
   number: number
@@ -19,6 +20,7 @@ export const getBetEarnings = (
   wheelFortune: WheelFortuneEntity,
   bet: BetEntity,
   result: number,
+  jackpot: Jackpot,
 ) => {
   const { bet: betData } = bet
   const winnerNumber = betData.find((b) => b.number === result)
@@ -27,11 +29,15 @@ export const getBetEarnings = (
     console.log('winner or payment  no encontrado')
     return
   }
+  let multiplier = payment.multiplier
+  if (winnerNumber.number === jackpot.number) {
+    multiplier = jackpot.multiplier
+  }
 
   return {
     amountOriginal: winnerNumber.amount,
     bet: winnerNumber.number,
-    earning: payment.multiplier * winnerNumber.amount,
+    earning: multiplier * winnerNumber.amount,
   }
 }
 
