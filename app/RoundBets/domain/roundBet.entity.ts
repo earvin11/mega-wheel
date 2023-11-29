@@ -1,4 +1,4 @@
-import { BetBody } from 'App/Bet/domain'
+import { BetBody } from '../../Bet/domain'
 
 export interface RoundBetEntity {
   numbers: BetBody[]

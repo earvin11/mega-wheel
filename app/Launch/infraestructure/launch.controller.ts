@@ -20,7 +20,7 @@ export class LaunchController {
     ) {}
 
     public launch = async ({ request, response }: HttpContextContract) => {
-        const { token, operatorUuid, casinoId, casinoToken } = request.body();
+        const { token, operatorUuid, casinoId, /*casinoToken*/ } = request.body();
         try {
             // Validar operador
             const operator = await this.operatorUseCases.getOperatorByUuid(operatorUuid)
@@ -87,13 +87,13 @@ export class LaunchController {
             const playerToRes = this.parseDocument(player!, 'player')
 
             response.ok({
-                minBet,
-                maxBet,
-                casino,
-                chips,
-                player: playerToRes,
-                operator: operatorToRes,
-                currency: currencyToRes,
+              minBet,
+              maxBet,
+              casino,
+              chips,
+              player: playerToRes,
+              operator: operatorToRes,
+              currency: currencyToRes,
             });
         } catch (error) {
             console.log('ERROR IN LAUNCH ->', error);

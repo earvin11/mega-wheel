@@ -1,40 +1,29 @@
 import { HttpContext } from '@adonisjs/core/build/standalone'
 import { BetUseCases } from '../application/bet.use-cases'
 import { BetEntity } from '../domain'
-import { getBetEarnings, toteBets, useWinnerFilter } from 'App/Shared/Helpers/wheel-utils'
-import { RoundUseCases } from 'App/Round/application/round.use-cases'
-import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases'
-import { RoundControlRedisUseCases } from '../../Round/application/round-control.redis.use-cases'
-import { BetControlRedisUseCases } from '../application/bet-control.redis.use-cases'
+import { getBetEarnings, useWinnerFilter } from '../../Shared/Helpers/wheel-utils'
+import { RoundUseCases } from '../../Round/application/round.use-cases'
+import { WheelFortuneUseCases } from '../../WheelFortune/apllication/wheel-fortune.use-cases'
 import { Jackpot } from 'App/Round/domain'
 
 export class BetController {
   constructor(
     private betUseCases: BetUseCases,
-    private betControlRedisUseCases: BetControlRedisUseCases,
     private roundUseCases: RoundUseCases,
-    private roundControlRedisUseCases: RoundControlRedisUseCases,
     private wheelFortuneUseCases: WheelFortuneUseCases,
   ) {}
 
   public createBet = async (ctx: HttpContext) => {
     const { request, response } = ctx
 
-    const providerId = request.body().providerId
+    // const providerId = request.body().providerId
     const bet = { ...request.body() }
 
     try {
       const round = await this.roundUseCases.findRoundByUuid(bet.roundUuid)
-      // const round = await this.roundControlRedisUseCases.getRound(bet.roundUuid)
       if (!round) return response.status(404).json({ error: 'No se encuentra el round' })
 
-      /* const phaseRound = await this.roundControlRedisUseCases.getPhase(providerId)
-      if (phaseRound !== 'bet_time') return response.unauthorized({ error: 'Round closed' }) */
-
       const createBet = await this.betUseCases.createBet(bet as BetEntity)
-
-      // SET REDIS
-      // await this.betControlRedisUseCases.setBet(createBet)
 
       return response.status(201).json({ message: 'Bet creado!', createBet })
     } catch (error) {

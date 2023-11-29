@@ -9,7 +9,7 @@ import {
   START_GAME_PUB_SUB,
 } from 'App/WheelFortune/infraestructure/constants'
 import { roundControlRedisUseCases } from 'App/Round/infraestructure/dependencies'
-import { betUseCases } from 'App/Bet/infraestructure/dependencies'
+import { betControlRedisRepository, betUseCases } from 'App/Bet/infraestructure/dependencies'
 import { operatorUseCases } from 'App/Operator/infrastructure/dependencies'
 import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependencies'
 import { currencyUseCases } from 'App/Currencies/infrastructure/dependencies'
@@ -84,9 +84,9 @@ Ws.io.on('connection', async (socket) => {
       user_id,
       round: roundId,
       platform,
-      plaerCountry,
-      player_ip,
-      userAgent,
+      // plaerCountry,
+      // player_ip,
+      // userAgent,
     } = betData
 
     try {
@@ -127,7 +127,7 @@ Ws.io.on('connection', async (socket) => {
         playerUuid: player,
         roundUuid: roundId,
         totalAmount,
-        currencyUuid: currency,
+        currencyUuid: currencyData.uuid,
         gameUuid,
       }
 
@@ -178,7 +178,8 @@ Ws.io.on('connection', async (socket) => {
       }
 
       // Guardar apuesta
-      await betUseCases.saveBet(createBet)
+      const betCreated = await betUseCases.saveBet(createBet)
+      await betControlRedisRepository.setBet(betCreated)
 
       return Ws.io.to(userRoom).emit(BET_SUCCESS_EVENT, {
         ok: true,

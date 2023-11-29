@@ -26,7 +26,7 @@ export class WheelFortuneUseCases {
     };
   };
 
-  public getManyBryProviderId = async (providerId: string) => {
+  public getManyByProviderId = async (providerId: string) => {
     try {
       const wheels = await this.wheelFortuneRepository.getManyByProviderId(providerId);
       return wheels;
