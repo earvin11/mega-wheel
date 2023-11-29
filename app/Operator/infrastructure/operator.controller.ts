@@ -399,7 +399,7 @@ export class OperatorController {
         return response.status(404).json({ error: 'No se encuentra el operador!' })
 
       const currencyData = await this.currencyUseCases.getCurrencyByUuid(currency);
-      if(!currencyData) return response.notFound({ error: 'Currency not found' });
+      if (!currencyData) return response.notFound({ error: 'Currency not found' });
 
       if (operatorExist.currencies?.includes(currencyData.isoCode))
         return response.status(400).json({ error: 'La moneda ya fue agregado el cliente!' })
@@ -440,15 +440,15 @@ export class OperatorController {
     try {
       const { uuid } = request.params();
       const { gameUuid, currencyUuid, minBet, maxBet } = request.body();
-    
+
       const operator = await this.operatorUseCases.getOperatorByUuid(uuid);
-      if(!operator) return response.notFound({ error: 'operator not found' });
+      if (!operator) return response.notFound({ error: 'operator not found' });
 
       const game = await this.gameUseCases.getByUuid(gameUuid);
-      if(!game) return response.notFound({ error: 'game not found' });
+      if (!game) return response.notFound({ error: 'game not found' });
 
       const currency = await this.currencyUseCases.getCurrencyByUuid(currencyUuid);
-      if(!currency) return response.notFound({ error: 'currency not found' });
+      if (!currency) return response.notFound({ error: 'currency not found' });
 
       const currencyAndLimits: CurrencyAndLimitsEntity[] = [
         {
@@ -485,7 +485,7 @@ export class OperatorController {
     }
   }
 
-  public getGamesByCurrency = async ({ request, response}: HttpContextContract) => {
+  public getGamesByCurrency = async ({ request, response }: HttpContextContract) => {
     const { uuid, currency } = request.params();
     try {
       const resp = await this.operatorUseCases.getGamesByCurrencyInOperator(uuid, currency);

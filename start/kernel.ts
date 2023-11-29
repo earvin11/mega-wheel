@@ -44,7 +44,8 @@ Server.middleware.registerNamed({
   validateToken: () => import('../app/Shared/Middlewares/validate-token'),
   createOperator: () => import('../app/Operator/infrastructure/createOperator.middleware'),
   createCroupier: () => import('App/Croupiers/infrastructure/createCroupier.middleware'),
-  createWheel: () => import('../app/WheelFortune/infraestructure/middlewares/create-wheel.middleware'),
+  createWheel: () =>
+    import('../app/WheelFortune/infraestructure/middlewares/create-wheel.middleware'),
   createClient: () => import('../app/Client/infrastructure/createClient.middleware'),
   createUser: () => import('../app/User/infrastructure/createUser.middleware'),
   createFaq: () => import('App/Faqs/infratructure/createFaq.middleware'),
@@ -55,4 +56,5 @@ Server.middleware.registerNamed({
   createChip: () => import('../app/Chip/infrastructure/createChip.middleware'),
   addPaymentsToOperator: () => import('../app/Operator/infrastructure/addPayments.middleware'),
   verifyOperatorGame: () => import('../app/Operator/infrastructure/verifyOperatorGame.middleware'),
+  pagination: () => import('../app/Shared/Middlewares/pagination'),
 })
