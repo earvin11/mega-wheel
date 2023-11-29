@@ -14,10 +14,8 @@ export interface ClientEntity {
   currencies?: string[]
 }
 
-export interface UpdateClientEntity extends Pick<ClientEntity,
-  'name'
-  | 'endpointAuth'
-  | 'endpointRollback'
-  | 'endpointBet'
-  | 'endpointWin'
-  >{ }
+export interface UpdateClientEntity
+  extends Pick<
+    ClientEntity,
+    'name' | 'endpointAuth' | 'endpointRollback' | 'endpointBet' | 'endpointWin'
+  > { }
