@@ -1,8 +1,8 @@
 import { BetEntity } from '../../Bet/domain'
 import { CurrencyEntity } from '../../Currencies/domain/currency.entity'
 import { RoundBet } from '../../RoundBets/domain/round-bet.value'
-import { initialPayments, multisAllowed } from '../../Bet/domain/Number'
-import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
+import { initialPayments, multisAllowed, numbers } from '../../Bet/domain/Number'
+import { RoundBetEntity, RoundBetType } from 'App/RoundBets/domain/roundBet.entity'
 import { randomNumber } from './randomNumber'
 import { Jackpot } from 'App/Round/domain'
 import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
@@ -75,12 +75,17 @@ export const getJackpot = (analysis: Analysis[]) => {
   return sortAnalysis[0]
 }
 
-export const roundBetUpdater = (
-  roundBet: RoundBet,
+export const getRoundBet = (
+  game: WheelFortuneEntity,
   bets: BetEntity[],
   currencies: CurrencyEntity[],
+  roundId: string,
 ) => {
-  const auxRoundBet = roundBet
+  const auxRoundBet = {
+    numbers: game.betPays.map((n) => ({ number: n.number, amount: 0 })),
+    totalAmount: 0,
+    roundId,
+  }
   for (let i = 0; i < bets.length; i++) {
     const currentBet = bets[i]
     const { bet, currencyUuid } = currentBet
@@ -112,7 +117,7 @@ interface CompleteAnalisys {
   percentEarning: number
   percentReturnToPlayer: number
 }
-export const useAnalisysPosible = (roundBet: RoundBetEntity): CompleteAnalisys[] => {
+export const useAnalisysPosible = (roundBet: RoundBetType): CompleteAnalisys[] => {
   const { numbers, totalAmount } = roundBet
 
   const completeAnalisys: CompleteAnalisys[] = []

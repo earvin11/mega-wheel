@@ -1,5 +1,11 @@
 import { OperatorRepository } from '../domain/operator.repository'
-import { OperatorEntity, OperatorUrlEntity, OperatorGameLimitsEntity, UpdateOperatorEntity, ConfigPaymentEntity } from '../domain/entities'
+import {
+  OperatorEntity,
+  OperatorUrlEntity,
+  OperatorGameLimitsEntity,
+  UpdateOperatorEntity,
+  ConfigPaymentEntity,
+} from '../domain/entities'
 import { Operator, OperatorGameLimits } from '../domain/implementations'
 
 export class OperatorUseCases {
@@ -79,57 +85,91 @@ export class OperatorUseCases {
     const operator = await this.operatorRepository.addCurrencyToOperator(uuid, currency)
     return operator
   }
-  
+
   public removeCurrencyToOperator = async (uuid: string, currency: string) => {
     const operator = await this.operatorRepository.removeCurrencyToOperator(uuid, currency)
-    return operator  
+    return operator
   }
 
   // GAMES AND LIMITS
-  public addGameLimitsInOperator = async (uuid: string, dataGameLimit: OperatorGameLimitsEntity): Promise<OperatorEntity | null> => {
+  public addGameLimitsInOperator = async (
+    uuid: string,
+    dataGameLimit: OperatorGameLimitsEntity,
+  ): Promise<OperatorEntity | null> => {
     try {
-      const newGameLimitInOperator = new OperatorGameLimits(dataGameLimit);
-      const operatorUpdated = await this.operatorRepository.addGameLimitsInOperator(uuid, newGameLimitInOperator);
-      return operatorUpdated;
+      const newGameLimitInOperator = new OperatorGameLimits(dataGameLimit)
+      const operatorUpdated = await this.operatorRepository.addGameLimitsInOperator(
+        uuid,
+        newGameLimitInOperator,
+      )
+      return operatorUpdated
     } catch (error) {
-      throw error;
+      throw error
     }
   }
-  public getAllGamesLimitsInOperator = async (uuid: string): Promise<[] | OperatorGameLimitsEntity[]> => {
+  public getAllGamesLimitsInOperator = async (
+    uuid: string,
+  ): Promise<[] | OperatorGameLimitsEntity[]> => {
     try {
-      const operatorGamesLimits = await this.operatorRepository.getAllGamesLimitsInOperator(uuid);
-      return operatorGamesLimits;
+      const operatorGamesLimits = await this.operatorRepository.getAllGamesLimitsInOperator(uuid)
+      return operatorGamesLimits
     } catch (error) {
-      throw error;
+      throw error
     }
   }
-  public getGameAndLimitsInOperator = async ({ uuid, operator, gameUuid }:{uuid?: string; operator?: OperatorEntity; gameUuid: string}): Promise<OperatorGameLimitsEntity | null> => {
+  public getGameAndLimitsInOperator = async ({
+    uuid,
+    operator,
+    gameUuid,
+  }: {
+    uuid?: string
+    operator?: OperatorEntity
+    gameUuid: string
+  }): Promise<OperatorGameLimitsEntity | null> => {
     try {
-      const operatorGameLimit = await this.operatorRepository.getGameAndLimitsInOperator({ gameUuid, uuid, operator });
-      return operatorGameLimit;
+      const operatorGameLimit = await this.operatorRepository.getGameAndLimitsInOperator({
+        gameUuid,
+        uuid,
+        operator,
+      })
+      return operatorGameLimit
     } catch (error) {
-      throw error;
+      throw error
     }
   }
-  public deleteGameAndLimitsInOperator = (uuid: string, gameUuid: string): Promise<OperatorEntity | null> => {
-    throw new Error('Method not implemented');
+  public deleteGameAndLimitsInOperator = (
+    uuid: string,
+    gameUuid: string,
+  ): Promise<OperatorEntity | null> => {
+    throw new Error('Method not implemented')
   }
   // CONFIG PAYMENT
-  public addConfigPaymentInGame = async (uuid: string, gameUuid: string, configPayment: ConfigPaymentEntity[]) => {
+  public addConfigPaymentInGame = async (
+    uuid: string,
+    gameUuid: string,
+    configPayment: ConfigPaymentEntity[],
+  ) => {
     try {
-      const operator = await this.operatorRepository.addConfigPaymentInGame(uuid, gameUuid, configPayment);
-      return operator;
+      const operator = await this.operatorRepository.addConfigPaymentInGame(
+        uuid,
+        gameUuid,
+        configPayment,
+      )
+      return operator
     } catch (error) {
-      throw error;
-    };
+      throw error
+    }
   }
 
-  public getGamesByCurrencyInOperator = async (uuid: string, isoCode: string): Promise<OperatorGameLimitsEntity[] | []> => {
+  public getGamesByCurrencyInOperator = async (
+    uuid: string,
+    isoCode: string,
+  ): Promise<OperatorGameLimitsEntity[] | []> => {
     try {
-      const games = await this.operatorRepository.getGamesByCurrencyInOperator(uuid, isoCode);
-      return games;
+      const games = await this.operatorRepository.getGamesByCurrencyInOperator(uuid, isoCode)
+      return games
     } catch (error) {
-      throw error;
+      throw error
     }
   }
 }

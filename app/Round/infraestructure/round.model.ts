@@ -7,7 +7,10 @@ const RoundSchema = new Schema<RoundEntity>(
     result: { type: Number, default: -1 },
     start_date: String,
     end_date: String,
-    jackpot: Object,
+    jackpot: {
+      number: { type: Number },
+      multiplier: { type: Number },
+    },
     gameUuid: { type: String, required: true },
     providerId: { type: String, required: true },
     identifierNumber: String,

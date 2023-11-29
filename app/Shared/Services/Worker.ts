@@ -2,7 +2,6 @@ import { parentPort } from 'worker_threads'
 import { connect } from 'mongoose'
 import { payBetsWinnerWorker } from '../Helpers/functions-worker'
 
-
 const MONGO_URL = <string>process.env.MONGO_URI
 
 const connectDatabase = async () => {
@@ -12,7 +11,6 @@ const connectDatabase = async () => {
 connectDatabase()
   .then(() => console.log('DB IS CONNECT'))
   .catch((error) => console.log(error))
-  
 
 parentPort?.on('message', async (data) => {
   const { cmd } = data
@@ -20,9 +18,10 @@ parentPort?.on('message', async (data) => {
   switch (cmd) {
     case 'pay-winners': {
       const { roundUuid } = data.winnersData
-      payBetsWinnerWorker(roundUuid);
-      break;
+      payBetsWinnerWorker(roundUuid)
+      break
     }
-    default: break;
+    default:
+      break
   }
 })

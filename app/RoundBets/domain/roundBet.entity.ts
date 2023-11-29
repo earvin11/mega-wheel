@@ -6,3 +6,9 @@ export interface RoundBetEntity {
   roundUuid: string
   totalAmount: number
 }
+
+export interface RoundBetType {
+  numbers: BetBody[]
+  roundId: string
+  totalAmount: number
+}
