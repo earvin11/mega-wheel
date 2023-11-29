@@ -9,8 +9,14 @@ import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity
 
 export class GameMongoRepository implements GameRepository {
 
-  public getGameByUuid(uuid: string): Promise<GameEntity | null> {
-    throw new Error('Method not implemented.')
+  public getGameByUuid = async (uuid: string): Promise<GameEntity | null> => {
+    try {
+      const game = await GameModel.findOne({ uuid });
+      if(!game) return null;
+      return game;
+    } catch (error) {
+      throw error;
+    }
   }
   public createGame = async (game: GameEntity): Promise<GameEntity> => {
     const gameCreated = await GameModel.create(game)

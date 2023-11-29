@@ -1,7 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator'
 import { operatorUseCases } from './dependencies';
-import { gameUseCases } from 'App/Game/infrastructure/dependencies';
+import { gameUseCases } from '../../Game/infrastructure/dependencies';
 
 export default class verifyOperatorGameMiddleware {
   public handle = async ({ request, response }: HttpContextContract, next: () => Promise<void>) => {
@@ -13,7 +13,6 @@ export default class verifyOperatorGameMiddleware {
       const operator = await operatorUseCases.getOperatorByUuid(uuid);
       if (!operator) return response.status(400).json({ error: 'Operador no encontrado!' })
       
-      if (!operator.games?.includes(gameUuid)) return response.status(400).json({ error: 'El operador no tiene el juego asignado' });
 
       const game = await gameUseCases.getGameByUuid(gameUuid);
       if (!game) return response.status(400).json({ error: 'El juego no existe' });

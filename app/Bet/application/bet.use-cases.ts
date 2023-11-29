@@ -1,7 +1,9 @@
 import { Bet, BetEntity, BetRepository } from '../domain'
 
 export class BetUseCases {
-  constructor(private readonly betRepository: BetRepository) {}
+  constructor(
+    private readonly betRepository: BetRepository,
+  ) {}
 
   public createBet = async (bet: BetEntity) => {
     try {
@@ -54,4 +56,5 @@ export class BetUseCases {
     const betSaved = await this.betRepository.createBet(bet);
     return betSaved;
   };
+  
 }

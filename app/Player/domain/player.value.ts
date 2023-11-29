@@ -1,6 +1,6 @@
-import { OperatorEntity } from "App/Operator/domain/entities"
+import { OperatorEntity } from "../../Operator/domain/entities"
 import { PlayerEntity } from "./player.entity"
-import { GenerateId } from "App/Shared/Helpers/generate-id.helpers"
+import { GenerateId } from "../../Shared/Helpers/generate-id.helpers"
 
 export class Player implements PlayerEntity {
     public userId: string

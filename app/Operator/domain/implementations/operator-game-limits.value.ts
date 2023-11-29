@@ -1,6 +1,6 @@
-import { GameEntity } from "App/Game/domain/game.entity";
+import { GameEntity } from "../../../Game/domain/game.entity";
 import { ConfigPaymentEntity, CurrencyAndLimitsEntity, OperatorGameLimitsEntity } from "../entities/operator-game-limits.entity";
-import { GenerateId } from "App/Shared/Helpers/generate-id.helpers";
+import { GenerateId } from "../../../Shared/Helpers/generate-id.helpers";
 
 export class OperatorGameLimits implements OperatorGameLimitsEntity {
     public game: GameEntity;

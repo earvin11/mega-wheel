@@ -1,4 +1,4 @@
-import { OperatorGameLimitsEntity } from "./operator-game-limits.entity"
+import { OperatorGameLimitsEntity } from './operator-game-limits.entity'
 
 export interface OperatorEntity {
   name: string

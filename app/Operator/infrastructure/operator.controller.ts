@@ -5,18 +5,10 @@ import { CreateAuditoryParams } from '../../Shared/Interfaces/create-auditory.in
 import CreateAuditory from '../../Shared/Helpers/create-auditory'
 import { OperatorUrlEntity } from '../domain/entities/operatorUrl.entity'
 import { UpdateOperatorEntity } from '../domain/entities/updateOperator.entity'
-// import { clientUseCases } from '../../Client/infrastructure/dependencies'
-// import { chipUseCase } from '../../Chip/infrastructure/dependencies'
-import { ChipEntity, UpdateChipEntity } from '../../Chip/domain/chip.entity'
-
-// import { gameUseCases } from '../../Game/infrastructure/dependencies'
-// import { currencyUseCases } from '../../Currencies/infrastructure/dependencies'
-// import { GameUseCases } from 'App/Game/application/GameUseCases'
-import { CurrencyUseCases } from 'App/Currencies/application/currencyUseCases'
-import { ChipUseCases } from 'App/Chip/application/ChipUseCase'
-import { ClientUseCases } from 'App/Client/application/ClientUseCases'
+import { CurrencyUseCases } from '../../Currencies/application/currencyUseCases'
+import { ClientUseCases } from '../../Client/application/ClientUseCases'
 import { CurrencyAndLimitsEntity } from '../domain/entities'
-import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases'
+import { WheelFortuneUseCases } from '../../WheelFortune/apllication/wheel-fortune.use-cases'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 
 export class OperatorController {
@@ -24,9 +16,7 @@ export class OperatorController {
     private operatorUseCases: OperatorUseCases,
     private clientUseCases: ClientUseCases,
     private gameUseCases: WheelFortuneUseCases,
-    // private gameUseCases: GameUseCases,
     private currencyUseCases: CurrencyUseCases,
-    private chipUseCases: ChipUseCases
   ) {}
 
   public createOperator = async (ctx: HttpContext) => {
@@ -77,6 +67,7 @@ export class OperatorController {
 
       return response.status(201).json({ message: 'Operador creado!', operator: operatorCreated })
     } catch (error) {
+      console.log(error)
       return response.status(400).json({ error: 'No se pudo crear el operador!' })
     }
   }
@@ -408,7 +399,7 @@ export class OperatorController {
         return response.status(404).json({ error: 'No se encuentra el operador!' })
 
       const currencyData = await this.currencyUseCases.getCurrencyByUuid(currency);
-      if(!currencyData) return response.notFound({ error: 'Currency not found' });
+      if (!currencyData) return response.notFound({ error: 'Currency not found' });
 
       if (operatorExist.currencies?.includes(currencyData.isoCode))
         return response.status(400).json({ error: 'La moneda ya fue agregado el cliente!' })
@@ -449,15 +440,15 @@ export class OperatorController {
     try {
       const { uuid } = request.params();
       const { gameUuid, currencyUuid, minBet, maxBet } = request.body();
-    
+
       const operator = await this.operatorUseCases.getOperatorByUuid(uuid);
-      if(!operator) return response.notFound({ error: 'operator not found' });
+      if (!operator) return response.notFound({ error: 'operator not found' });
 
       const game = await this.gameUseCases.getByUuid(gameUuid);
-      if(!game) return response.notFound({ error: 'game not found' });
+      if (!game) return response.notFound({ error: 'game not found' });
 
       const currency = await this.currencyUseCases.getCurrencyByUuid(currencyUuid);
-      if(!currency) return response.notFound({ error: 'currency not found' });
+      if (!currency) return response.notFound({ error: 'currency not found' });
 
       const currencyAndLimits: CurrencyAndLimitsEntity[] = [
         {
@@ -494,7 +485,7 @@ export class OperatorController {
     }
   }
 
-  public getGamesByCurrency = async ({ request, response}: HttpContextContract) => {
+  public getGamesByCurrency = async ({ request, response }: HttpContextContract) => {
     const { uuid, currency } = request.params();
     try {
       const resp = await this.operatorUseCases.getGamesByCurrencyInOperator(uuid, currency);

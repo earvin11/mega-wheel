@@ -1,28 +1,29 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { Worker } from 'worker_threads'
 import { HttpContext } from '@adonisjs/core/build/standalone'
 import { RoundUseCases } from '../application/round.use-cases'
 import Redis from '@ioc:Adonis/Addons/Redis'
-import { CHANGE_PHASE_EVENT, END_GAME_PUB_SUB } from 'App/WheelFortune/infraestructure/constants'
+import { CHANGE_PHASE_EVENT, END_GAME_PUB_SUB } from '../../WheelFortune/infraestructure/constants'
 import { RoundControlRedisUseCases } from '../application/round-control.redis.use-cases'
-import { sleep } from 'App/Shared/Helpers/sleep'
-import SocketServer from 'App/Services/Ws'
-import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases'
+import { sleep } from '../../Shared/Helpers/sleep'
+import SocketServer from '../../Services/Ws'
+import { WheelFortuneUseCases } from '../../WheelFortune/apllication/wheel-fortune.use-cases'
 import { Phase, RoundEntity } from '../domain'
 import Logger from '@ioc:Adonis/Core/Logger'
-import { GenerateJWT } from 'App/Shared/Helpers/generate-jwt'
+import { GenerateJWT } from '../../Shared/Helpers/generate-jwt'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { RoundBetUseCases } from 'App/RoundBets/application/round-bet-use-case'
 import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
-import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
-import BetModel from 'App/Bet/infraestructure/bet.model'
-import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
-import {
-  roundBetUpdater,
-  useAnalisysPosible,
-  useJackpot,
-  useJackpotRandom,
-} from 'App/Shared/Helpers/wheel-utils'
-import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
+// import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
+// import BetModel from 'App/Bet/infraestructure/bet.model'
+// import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
+// import {
+//   useAnalisysPosible,
+//   useJackpot,
+//   useJackpotRandom,
+// } from 'App/Shared/Helpers/wheel-utils'
+
+const worker = new Worker('./app/Shared/Services/Worker')
 
 export class RoundController {
   constructor(
@@ -57,7 +58,6 @@ export class RoundController {
         return this.changePhase(providerId, phase, SocketServer.io)
 
       const games = await this.wheelUseCases.getManyByProviderId(providerId)
-
       if (!games || !games.length) return
 
       const rounds = await Promise.all(
@@ -156,7 +156,7 @@ export class RoundController {
       await Promise.all(rounds.map((round) => this.roundUseCases.closeRound(round.uuid, result)))
 
       await Promise.all(
-        rounds.map((round) => {
+        rounds.map(async (round) => {
           SocketServer.io.to(`${round.gameUuid}`).emit('round:end', {
             msg: 'Round result',
             result,
@@ -164,9 +164,17 @@ export class RoundController {
 
           Redis.del(`round:${round.uuid}`)
           Redis.del(`bets:${round.uuid}`)
+
+          worker.postMessage({
+            cmd: 'pay-winners',
+            winnersData: {
+              roundUuid: round.uuid,
+            },
+          })
           return
         }),
       )
+
       await this.changePhase(providerId, 'processing_next_round', SocketServer.io)
       Redis.publish(END_GAME_PUB_SUB, providerId)
 
@@ -181,19 +189,19 @@ export class RoundController {
       response.internalServerError({ error: 'TALK TO ADMINISTRATOR' })
     }
   }
-  public updateRound = async ({ request, response }: HttpContext) => {
-    const { uuid } = request.body()
+  // public updateRound = async ({ request, response }: HttpContext) => {
+  //   const { uuid } = request.body()
 
-    const round = await this.roundUseCases.findRoundByUuid(uuid)
-    const roundBet = await RoundBetModel.findOne({ roundUuid: uuid }).exec()
-    const bets = await BetModel.find({ roundUuid: uuid })
-    const currencies = await CurrencyModel.find()
-    // const { numbers } = roundBetUpdater(roundBet as RoundBet, bets, currencies)
-    // const newRoundBet = this.roundBetUseCases.updateRoundBet(roundBet?.uuid as string, numbers)
-    const completeAnalisys = useAnalisysPosible(roundBet as RoundBetEntity)
+  //   const round = await this.roundUseCases.findRoundByUuid(uuid)
+  //   const roundBet = await RoundBetModel.findOne({ roundUuid: uuid }).exec()
+  //   const bets = await BetModel.find({ roundUuid: uuid })
+  //   const currencies = await CurrencyModel.find()
+  //   // const { numbers } = roundBetUpdater(roundBet as RoundBet, bets, currencies)
+  //   // const newRoundBet = this.roundBetUseCases.updateRoundBet(roundBet?.uuid as string, numbers)
+  //   const completeAnalisys = useAnalisysPosible(roundBet as RoundBetEntity)
 
-    const jackpot = useJackpot(completeAnalisys, 95)
-    const jackpotRandom = useJackpotRandom(completeAnalisys, 95)
-    response.ok({ round, completeAnalisys, jackpot, jackpotRandom })
-  }
+  //   const jackpot = useJackpot(completeAnalisys, 95)
+  //   const jackpotRandom = useJackpotRandom(completeAnalisys, 95)
+  //   response.ok({ round, completeAnalisys, jackpot, jackpotRandom })
+  // }
 }

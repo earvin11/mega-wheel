@@ -18,9 +18,12 @@ export class WheelFortuneController {
         language,
         logo,
         providerId,
-        urlTransmision
+        urlTransmision,
+        launchUrl,
+        percentReturnToPlayer,
+        betOptions,
+        betPays,
       } = request.body();
-
 
       const newWheel = await this.wheelUseCases.create({
         name,
@@ -32,7 +35,11 @@ export class WheelFortuneController {
         language,
         logo,
         providerId,
-        urlTransmision
+        urlTransmision,
+        launchUrl,
+        percentReturnToPlayer,
+        betOptions,
+        betPays,
       });
 
       response.created(newWheel);

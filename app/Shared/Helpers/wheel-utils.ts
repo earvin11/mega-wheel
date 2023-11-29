@@ -1,11 +1,11 @@
-import { BetEntity } from 'App/Bet/domain'
-import { initialPayments, multisAllowed } from 'App/Bet/domain/Number'
-import { CurrencyEntity } from 'App/Currencies/domain/currency.entity'
-import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
+import { BetEntity } from '../../Bet/domain'
+import { CurrencyEntity } from '../../Currencies/domain/currency.entity'
+import { RoundBet } from '../../RoundBets/domain/round-bet.value'
+import { initialPayments, multisAllowed } from '../../Bet/domain/Number'
 import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
-import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 import { randomNumber } from './randomNumber'
 import { Jackpot } from 'App/Round/domain'
+import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 
 interface Analysis {
   number: number
@@ -24,7 +24,8 @@ export const getBetEarnings = (
 ) => {
   const { bet: betData } = bet
   const winnerNumber = betData.find((b) => b.number === result)
-  const payment = initialPayments.find((b) => b.number === result)
+  const payment = wheelFortune.betPays.find((b) => b.number === result)
+  // const payment = initialPayments.find((b) => b.number === result)
   if (!winnerNumber || !payment) {
     console.log('winner or payment  no encontrado')
     return
@@ -180,3 +181,5 @@ export const useJackpot = (
   }
   return multsValid[0]
 }
+
+

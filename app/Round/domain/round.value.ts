@@ -1,4 +1,4 @@
-import { GenerateId } from 'App/Shared/Helpers/generate-id.helpers'
+import { GenerateId } from '../../Shared/Helpers/generate-id.helpers'
 import { Jackpot, RoundEntity } from './round.entity'
 
 export class Round implements RoundEntity {
