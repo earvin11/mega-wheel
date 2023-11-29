@@ -20,9 +20,10 @@ export class WheelFortuneController {
         providerId,
         urlTransmision,
         launchUrl,
-        percentReturnToPlayer
+        percentReturnToPlayer,
+        betOptions,
+        betPays,
       } = request.body();
-
 
       const newWheel = await this.wheelUseCases.create({
         name,
@@ -36,7 +37,9 @@ export class WheelFortuneController {
         providerId,
         urlTransmision,
         launchUrl,
-        percentReturnToPlayer
+        percentReturnToPlayer,
+        betOptions,
+        betPays,
       });
 
       response.created(newWheel);
