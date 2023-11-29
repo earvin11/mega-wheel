@@ -19,6 +19,7 @@ const roundBetsSchema = new Schema<RoundBetEntity>(
     uuid: {
       type: String,
     },
+    totalAmount: { type: Number, default: 0 },
   },
   { timestamps: true },
 )

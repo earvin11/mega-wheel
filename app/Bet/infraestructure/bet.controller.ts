@@ -6,6 +6,7 @@ import { RoundUseCases } from 'App/Round/application/round.use-cases'
 import { WheelFortuneUseCases } from 'App/WheelFortune/apllication/wheel-fortune.use-cases'
 import { RoundControlRedisUseCases } from '../../Round/application/round-control.redis.use-cases'
 import { BetControlRedisUseCases } from '../application/bet-control.redis.use-cases'
+import { Jackpot } from 'App/Round/domain'
 
 export class BetController {
   constructor(
@@ -54,7 +55,7 @@ export class BetController {
 
       // comprobar player
 
-      const { result } = round
+      const { result, jackpot } = round
       const filter = useWinnerFilter(result as number)
       const betWinner = await this.betUseCases.getWinner({
         roundUuid: round.uuid,
@@ -66,7 +67,7 @@ export class BetController {
       }
 
       const bets = await this.betUseCases.findBetsByRoundUuid(round.uuid!)
-      const earnings = getBetEarnings(wheelFortune, betWinner, result as number)
+      const earnings = getBetEarnings(wheelFortune, betWinner, result as number, jackpot as Jackpot)
 
       return response.status(200).json({ message: "you've won!", win: true, earnings, bets })
     } catch (error) {

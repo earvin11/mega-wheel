@@ -1,8 +1,11 @@
 import { BetEntity } from 'App/Bet/domain'
-import { initialPayments } from 'App/Bet/domain/Number'
+import { initialPayments, multisAllowed } from 'App/Bet/domain/Number'
 import { CurrencyEntity } from 'App/Currencies/domain/currency.entity'
 import { RoundBet } from 'App/RoundBets/domain/round-bet.value'
+import { RoundBetEntity } from 'App/RoundBets/domain/roundBet.entity'
 import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
+import { randomNumber } from './randomNumber'
+import { Jackpot } from 'App/Round/domain'
 
 interface Analysis {
   number: number
@@ -17,6 +20,7 @@ export const getBetEarnings = (
   wheelFortune: WheelFortuneEntity,
   bet: BetEntity,
   result: number,
+  jackpot: Jackpot,
 ) => {
   const { bet: betData } = bet
   const winnerNumber = betData.find((b) => b.number === result)
@@ -25,11 +29,15 @@ export const getBetEarnings = (
     console.log('winner or payment  no encontrado')
     return
   }
+  let multiplier = payment.multiplier
+  if (winnerNumber.number === jackpot.number) {
+    multiplier = jackpot.multiplier
+  }
 
   return {
     amountOriginal: winnerNumber.amount,
     bet: winnerNumber.number,
-    earning: payment.multiplier * winnerNumber.amount,
+    earning: multiplier * winnerNumber.amount,
   }
 }
 
@@ -95,4 +103,80 @@ export const roundBetUpdater = (
   }
 
   return auxRoundBet
+}
+interface CompleteAnalisys {
+  number: number
+  naturalPay: number
+  mult: number
+  payWithMul: number
+  percentEarning: number
+  percentReturnToPlayer: number
+}
+export const useAnalisysPosible = (roundBet: RoundBetEntity): CompleteAnalisys[] => {
+  const { numbers, totalAmount } = roundBet
+
+  const completeAnalisys: CompleteAnalisys[] = []
+
+  for (let i = 0; i < numbers.length; i++) {
+    const currentNumber = numbers[i]
+    const { amount, number } = currentNumber
+
+    multisAllowed.forEach((mult) => {
+      const analysisObject = {
+        number,
+        naturalPay: amount * (number + 1),
+      }
+      const payWithMul = amount * (mult + 1)
+      const percentEarning = ((totalAmount - payWithMul) / totalAmount) * 100
+      const percentReturnToPlayer = 100 - percentEarning
+      if (mult > number) {
+        Object.assign(analysisObject, {
+          mult,
+          payWithMul,
+          percentEarning,
+          percentReturnToPlayer,
+        })
+        completeAnalisys.push(analysisObject as CompleteAnalisys)
+      }
+    })
+  }
+
+  return completeAnalisys
+}
+
+export const useJackpotRandom = (
+  completeAnalisys: CompleteAnalisys[],
+  percentReturnToPlayer: number,
+): CompleteAnalisys => {
+  const multsValid = completeAnalisys.filter(
+    (c) => c.percentReturnToPlayer <= percentReturnToPlayer,
+  )
+  const mandatoryMult = completeAnalisys.sort(
+    (a: CompleteAnalisys, b: CompleteAnalisys) => a.percentReturnToPlayer - b.percentReturnToPlayer,
+  )[0]
+
+  if (!multsValid.length) {
+    return mandatoryMult
+  }
+  return multsValid[randomNumber(0, multsValid.length - 1)]
+}
+
+export const useJackpot = (
+  completeAnalisys: CompleteAnalisys[],
+  percentReturnToPlayer: number,
+): CompleteAnalisys => {
+  const multsValid = completeAnalisys
+    .filter((c) => c.percentReturnToPlayer <= percentReturnToPlayer)
+    .sort(
+      (a: CompleteAnalisys, b: CompleteAnalisys) =>
+        a.percentReturnToPlayer - b.percentReturnToPlayer,
+    )
+  const mandatoryMult = completeAnalisys.sort(
+    (a: CompleteAnalisys, b: CompleteAnalisys) => a.percentReturnToPlayer - b.percentReturnToPlayer,
+  )[0]
+
+  if (!multsValid.length) {
+    return mandatoryMult
+  }
+  return multsValid[0]
 }
