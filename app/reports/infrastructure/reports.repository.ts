@@ -61,9 +61,7 @@ export class ReportsMongoRepository implements ReportsRepository {
       games.push('X')
     }
 
-    filter['game.uuid'] = {
-      $in: games,
-    }
+    if (games.length) filter['game.uuid'] = { $in: games }
 
     if (game) {
       filter['game.uuid'] = game
