@@ -20,6 +20,8 @@ import { BetEntity } from 'App/Bet/domain'
 import { DebitWalletRequest } from 'App/Shared/Interfaces/wallet.interfaces'
 import { sendBet } from 'App/Shared/Helpers/wallet-request'
 import { getPlayersOnline } from 'App/Shared/Helpers/get-players-online'
+import { logUseCases } from '../app/Log/infrastructure/dependencies';
+import { TypesLogsErrors } from '../app/Log/domain/log.entity';
 const Ws = SocketServer
 Ws.boot()
 
@@ -122,13 +124,14 @@ Ws.io.on('connection', async (socket) => {
         return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, { message: 'PLayer not found or disabled' })
 
       const totalAmount = calculateAmountBet(bet)
-      const dataBet = {
+      const dataBet: BetEntity = {
         bet,
         playerUuid: player,
         roundUuid: roundId,
         totalAmount,
-        currencyUuid: currencyData.uuid,
-        gameUuid,
+        currencyUuid: currencyData.uuid!,
+        gameUuid: game.uuid!,
+        currencyIsoCode: currencyData.isoCode
       }
 
       // Instanciar apuesta
@@ -144,7 +147,7 @@ Ws.io.on('connection', async (socket) => {
         bet_code: createBet.uuid!,
         bet_date: String(new Date()),
         platform: String(platform),
-        currency: String(currency),
+        currency: currencyData.isoCode,
         transactionType: 'bet',
       }
 
@@ -152,13 +155,13 @@ Ws.io.on('connection', async (socket) => {
       try {
         const respWallet: any = await sendBet(operator.endpointBet, objWallet)
         if (!respWallet.data.ok) {
-          // await logUseCases.createLog({
-          //   typeError: TypesLogsErrors.debit,
-          //   request: objWallet,
-          //   response: respWallet.data,
-          //   error: respWallet.data.msg || '',
-          //   player,
-          // })
+          await logUseCases.createLog({
+            typeError: TypesLogsErrors.debit,
+            request: objWallet,
+            response: respWallet.data,
+            error: respWallet.data.msg || '',
+            player,
+          })
           return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, {
             msg: respWallet.data.msg,
             error: 'error in wallet',
@@ -166,12 +169,12 @@ Ws.io.on('connection', async (socket) => {
         }
       } catch (error) {
         console.log('ERROR SEND BET TO WALLET -> ', error)
-        // await logUseCases.createLog({
-        //   typeError: TypesLogsErrors.debit,
-        //   request: objWallet,
-        //   response: error,
-        //   player,
-        // })
+        await logUseCases.createLog({
+          typeError: TypesLogsErrors.debit,
+          request: objWallet,
+          response: error,
+          player,
+        })
         return Ws.io.to(userRoom).emit(BET_ERROR_EVENT, {
           error: 'error in wallet',
         })

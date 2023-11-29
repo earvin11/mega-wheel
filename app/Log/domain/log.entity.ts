@@ -1,8 +1,19 @@
 export interface LogEntity {
-  request: string
-  response: string
-  error: string
-  ip: string
-  player: string
-  uuid?: string
+  typeError: TypesLogsErrors;
+  request?: any;
+  response?: any;
+  error?: string;
+  ip?: string;
+  player?: string;
+  uuid?: string;
+}
+
+export enum TypesLogsErrors {
+  credit = 'credit',
+  debit = 'debit',
+  rollback = 'rollback'
+}
+
+export interface FilterLog {
+    typeError?: TypesLogsErrors;
 }

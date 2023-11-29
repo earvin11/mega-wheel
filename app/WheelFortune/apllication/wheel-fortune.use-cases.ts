@@ -10,7 +10,7 @@ export class WheelFortuneUseCases {
 
   public create = async (wheelFortune: WheelFortuneEntity) => {
     try {
-      const newWheel = new WheelForune(wheelFortune);
+      const newWheel  = new WheelForune(wheelFortune);
       const wheelCreated = await this.wheelFortuneRepository.create(newWheel);
       return wheelCreated;
     } catch (error) {

@@ -2,7 +2,7 @@ import { LogRepository } from '../domain/log.repository'
 import { LogEntity } from '../domain/log.entity'
 import { Log } from '../domain/log.value'
 
-export class LogUseCase {
+export class LogUseCases {
   constructor(private readonly LogRepository: LogRepository) {}
 
   public createLog = async (log: LogEntity) => {
@@ -11,8 +11,8 @@ export class LogUseCase {
     return logCreated
   }
 
-  public getAllLogs = async (page: number, limit: number) => {
-    const logs = await this.LogRepository.getAllLogs(page, limit)
+  public getAllLogs = async (page: number, limit: number, typeError?: string) => {
+    const logs = await this.LogRepository.getAllLogs(page, limit, typeError)
     return logs
   }
 }
