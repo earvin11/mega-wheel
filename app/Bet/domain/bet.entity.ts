@@ -7,6 +7,9 @@ export interface BetEntity {
   isPaid?: boolean
   totalAmount: number
   currencyUuid: string
+  currencyIsoCode: string
+  createdAt?: string
+  _id?: string
 }
 
 export interface BetBody {

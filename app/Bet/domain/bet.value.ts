@@ -1,4 +1,4 @@
-import { GenerateId } from 'App/Shared/Helpers/generate-id.helpers';
+import { GenerateId } from '../../Shared/Helpers/generate-id.helpers';
 import { BetBody, BetEntity } from './bet.entity';
 
 export class Bet implements BetEntity {
@@ -10,6 +10,7 @@ export class Bet implements BetEntity {
     public isPaid: boolean;
     public totalAmount: number;
     public currencyUuid: string;
+    public currencyIsoCode: string;
 
     constructor(bet: BetEntity) {
         this.bet = bet.bet;
@@ -20,5 +21,6 @@ export class Bet implements BetEntity {
         this.isPaid = false;
         this.totalAmount = bet.totalAmount;
         this.currencyUuid =  bet.currencyUuid;
+        this.currencyIsoCode = bet.currencyIsoCode;
     };
 };

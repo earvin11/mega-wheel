@@ -6,7 +6,10 @@ export default class ProductRequest {
     const wheelSchema = schema.create({
       name: schema.string(),
       providerId: schema.string(),
-      betTime: schema.number()
+      betTime: schema.number(),
+      launchUrl: schema.string(),
+      betOptions: schema.array().members(schema.number()),
+      betPays: schema.array().anyMembers()
     });
   
     try {
