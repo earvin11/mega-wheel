@@ -15,13 +15,16 @@ import { wheelFortuneUseCases } from 'App/WheelFortune/infraestructure/dependenc
 import { currencyUseCases } from 'App/Currencies/infrastructure/dependencies'
 import { playerUseCases } from 'App/Player/infraestructure/dependencies'
 
-import { calculateAmountBet } from 'App/Shared/Helpers/utils-functions'
+import { calculateAmountBet, exchangeCurrencyByDollar } from 'App/Shared/Helpers/utils-functions'
 import { BetEntity } from 'App/Bet/domain'
 import { DebitWalletRequest } from 'App/Shared/Interfaces/wallet.interfaces'
 import { sendBet } from 'App/Shared/Helpers/wallet-request'
 import { getPlayersOnline } from 'App/Shared/Helpers/get-players-online'
 import { logUseCases } from '../app/Log/infrastructure/dependencies';
 import { TypesLogsErrors } from '../app/Log/domain/log.entity';
+import { transactionsUseCases } from 'App/Transaction/infrastructure/dependencies'
+import { TypesTransaction } from 'App/Transaction/domain/transactions.entity'
+
 const Ws = SocketServer
 Ws.boot()
 
@@ -86,9 +89,9 @@ Ws.io.on('connection', async (socket) => {
       user_id,
       round: roundId,
       platform,
-      // plaerCountry,
-      // player_ip,
-      // userAgent,
+      playerCountry,
+      player_ip,
+      userAgent,
     } = betData
 
     try {
@@ -181,8 +184,26 @@ Ws.io.on('connection', async (socket) => {
       }
 
       // Guardar apuesta
+      const currencyExchangeDollar = exchangeCurrencyByDollar(currencyData)
       const betCreated = await betUseCases.saveBet(createBet)
       await betControlRedisRepository.setBet(betCreated)
+      await transactionsUseCases.createTransaction({
+        amount: totalAmount,
+        amountExchangeDollar: totalAmount * currencyExchangeDollar,
+        bet: betCreated,
+        currency: currencyData,
+        currencyExchangeDollar: currencyExchangeDollar,
+        game,
+        player: playerData,
+        typeTransaction: TypesTransaction.debit,
+        platform: platform ? platform : 'desktop',
+        playerCountry: playerCountry ? playerCountry : 'VEF',
+        round,
+        playerIp: player_ip ? player_ip : '131232',
+        userAgent: userAgent ? userAgent : 'firefox',
+        userBalance: playerData.lastBalance - totalAmount,
+        usersOnline: playersOnline.length,
+      })
 
       return Ws.io.to(userRoom).emit(BET_SUCCESS_EVENT, {
         ok: true,

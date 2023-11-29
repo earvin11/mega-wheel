@@ -95,6 +95,7 @@ export class ReportsMongoRepository implements ReportsRepository {
           'jackpot': 1,
           'game.uuid': 1,
           'game.name': 1,
+          'createdAt': 1,
         },
       },
       {
