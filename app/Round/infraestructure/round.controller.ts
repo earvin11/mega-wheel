@@ -15,9 +15,9 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { RoundBetUseCases } from 'App/RoundBets/application/round-bet-use-case'
 import { RoundBetEntity, RoundBetType } from 'App/RoundBets/domain/roundBet.entity'
 import { BetBody, BetEntity } from 'App/Bet/domain'
-import { BetControlRedisRepository } from 'App/Bet/infraestructure/repositories/bet-control.redis-repository'
 import { getRoundBet, useAnalisysPosible, useJackpot } from 'App/Shared/Helpers/wheel-utils'
 import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
+import { BetControlRedisUseCases } from 'App/Bet/application/bet-control.redis.use-cases'
 // import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
 // import BetModel from 'App/Bet/infraestructure/bet.model'
 // import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
@@ -35,8 +35,8 @@ export class RoundController {
     private roundControlRedisUseCases: RoundControlRedisUseCases,
     private wheelUseCases: WheelFortuneUseCases,
     private roundBetUseCases: RoundBetUseCases,
-    private betControlRedisRepository: BetControlRedisRepository,
-  ) {}
+    private betControlRedisUseCases: BetControlRedisUseCases,
+  ) { }
 
   private changePhase = async (table: string, phase: Phase, io: any, timeWait?: number) => {
     await this.roundControlRedisUseCases.toPhase(table, phase)
@@ -102,10 +102,9 @@ export class RoundController {
       const currencies = await CurrencyModel.find()
       const bets: BetEntity[] = []
       for (let i = 0; i < roundsClosed.length; i++) {
-        const betsToPush = await this.betControlRedisRepository.getBetsByRound(
-          roundsClosed[i]?.uuid!,
-        )
-        bets.concat(betsToPush)
+        const betsToPush = await this.betControlRedisUseCases.getBetsByRound(roundsClosed[i]?.uuid!)
+
+        bets.push(...betsToPush)
       }
 
       const roundBets: RoundBetType[] = []
@@ -115,6 +114,7 @@ export class RoundController {
         const roundBet = getRoundBet(gamefiltered!, betsFiltered, currencies, r?.uuid!)
         roundBets.push(roundBet)
       })
+
       await this.changePhase(providerId, 'processing_jackpot', SocketServer.io)
 
       const roundsWithJackpot = await Promise.all(

@@ -103,9 +103,13 @@ export const getRoundBet = (
       }
 
       const newAmount = currentNumber?.amount + b.amount * filteredCurrency.usdRateChange
+
       auxRoundBet.numbers[auxRoundBet.numbers.indexOf(currentNumber)].amount = newAmount
     })
   }
+  auxRoundBet.numbers.forEach((n) => {
+    auxRoundBet.totalAmount += auxRoundBet.totalAmount + n.amount
+  })
 
   return auxRoundBet
 }
@@ -121,11 +125,9 @@ export const useAnalisysPosible = (roundBet: RoundBetType): CompleteAnalisys[] =
   const { numbers, totalAmount } = roundBet
 
   const completeAnalisys: CompleteAnalisys[] = []
-
   for (let i = 0; i < numbers.length; i++) {
     const currentNumber = numbers[i]
     const { amount, number } = currentNumber
-
     multisAllowed.forEach((mult) => {
       const analysisObject = {
         number,

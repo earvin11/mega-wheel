@@ -31,7 +31,6 @@ export class AuditoryMongoRepository implements AuditoryRepository {
           $gte: new Date(fromDate),
         }
       }
-      console.log(searchParams['createdAt'])
     }
 
     if (action) {

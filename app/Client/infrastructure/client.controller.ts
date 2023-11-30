@@ -39,12 +39,8 @@ export class ClientController {
   }
 
   public getAllClients = async ({ response }: HttpContext) => {
-    console.log('aqui')
-
     try {
       const clients = await this.clientUseCases.getAllClients()
-      console.log('clients', clients)
-
       if (clients.length === 0)
         return response.status(404).json({ error: 'No existen clientes registrados' })
 
