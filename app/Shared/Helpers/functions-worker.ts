@@ -81,7 +81,6 @@ export const payWinners = async ({
     if (!earnings) return
 
     const { earning } = earnings
-    console.log('earnings', earnings)
     const dataWalletWin: CreditWalletRequest = {
       user_id: player.userId,
       round_id: roundId,

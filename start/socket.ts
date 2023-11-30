@@ -78,7 +78,6 @@ Ws.io.on('connection', async (socket) => {
   }
 
   socket.on(BET, async (betData: any) => {
-    console.log('BET')
 
     const {
       player, //UUID
