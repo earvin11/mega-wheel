@@ -153,9 +153,10 @@ Ws.io.on('connection', async (socket) => {
         transactionType: 'bet',
       }
 
+      let respWallet: any
       // Envia la bet a la wallet
       try {
-        const respWallet: any = await sendBet(operator.endpointBet, objWallet)
+        respWallet = await sendBet(operator.endpointBet, objWallet)
         if (!respWallet.data.ok) {
           await logUseCases.createLog({
             typeError: TypesLogsErrors.debit,
@@ -182,6 +183,14 @@ Ws.io.on('connection', async (socket) => {
         })
       }
 
+      // * BALANCE FROM WALLET
+
+      const { lastBalance: balanceWallet } = respWallet.data
+
+      const userBalance = typeof balanceWallet === 'string' ? Number(balanceWallet) : 0
+
+      // *
+
       // Guardar apuesta
       const currencyExchangeDollar = exchangeCurrencyByDollar(currencyData)
       const betCreated = await betUseCases.saveBet(createBet)
@@ -200,7 +209,7 @@ Ws.io.on('connection', async (socket) => {
         round,
         playerIp: player_ip ? player_ip : '131232',
         userAgent: userAgent ? userAgent : 'firefox',
-        userBalance: playerData.lastBalance - totalAmount,
+        userBalance,
         usersOnline: playersOnline.length,
       })
 

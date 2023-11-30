@@ -45,12 +45,14 @@ export const payBetsWinnerWorker = async (roundUuid: string) => {
   const betsWinner = await getBetsWinnerByResult(roundUuid, result)
   if (!betsWinner.length) return
 
-  payWinners({
+  const winners: any[] | undefined = await payWinners({
     bets: betsWinner,
     result,
     roundId: roundUuid,
     jackpot,
   })
+
+  return winners
 }
 
 export const payWinners = async ({
@@ -63,7 +65,10 @@ export const payWinners = async ({
   result: number
   roundId: string
   jackpot: Jackpot
-}) => {
+}): Promise<any[] | undefined> => {
+
+  const winners: any[] = []
+
   for (let i = 0; i < bets.length; i++) {
     const bet = bets[i]
 
@@ -106,6 +111,15 @@ export const payWinners = async ({
         })
         console.log({ wallet: 'Error in wallet', data })
       }
+      winners.push({
+        toWallet: {
+          ...dataWalletWin!,
+          game: wheel,
+          player,
+          bet,
+        },
+        wallet: data!,
+      })
     } catch (error) {
       console.log('ERROR CREDITO -> ', error)
       await logUseCases.createLog({
@@ -117,4 +131,6 @@ export const payWinners = async ({
       continue
     }
   }
+
+  return winners
 }

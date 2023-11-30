@@ -11,4 +11,12 @@ export class TransactionsUseCases {
       throw err
     }
   }
+
+  public saveCredits = async (data) => {
+    try {
+      this.transactionRepository.saveCredits(data)
+    } catch (error) {
+      throw error
+    }
+  }
 }

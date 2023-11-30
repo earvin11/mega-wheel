@@ -18,7 +18,8 @@ parentPort?.on('message', async (data) => {
   switch (cmd) {
     case 'pay-winners': {
       const { roundUuid } = data.winnersData
-      payBetsWinnerWorker(roundUuid)
+      const winners = await payBetsWinnerWorker(roundUuid)
+      parentPort?.postMessage({ cmd: 'winners', data: JSON.stringify(winners) })
       break
     }
     default:

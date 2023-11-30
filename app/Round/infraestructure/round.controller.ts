@@ -14,10 +14,11 @@ import { GenerateJWT } from '../../Shared/Helpers/generate-jwt'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { RoundBetUseCases } from 'App/RoundBets/application/round-bet-use-case'
 import { RoundBetEntity, RoundBetType } from 'App/RoundBets/domain/roundBet.entity'
-import { BetBody, BetEntity } from 'App/Bet/domain'
+import { BetEntity } from 'App/Bet/domain'
 import { getRoundBet, useAnalisysPosible, useJackpot } from 'App/Shared/Helpers/wheel-utils'
 import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
 import { BetControlRedisUseCases } from 'App/Bet/application/bet-control.redis.use-cases'
+import { transactionsUseCases } from 'App/Transaction/infrastructure/dependencies'
 // import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
 // import BetModel from 'App/Bet/infraestructure/bet.model'
 // import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
@@ -28,6 +29,21 @@ import { BetControlRedisUseCases } from 'App/Bet/application/bet-control.redis.u
 // } from 'App/Shared/Helpers/wheel-utils'
 
 const worker = new Worker('./app/Shared/Services/Worker')
+
+worker.on('message', async (data) => {
+  const { cmd } = data
+
+  switch (cmd) {
+    case 'winners':
+      const { data: dataStringified } = data
+      if (!dataStringified) return Logger.info('No hay winners')
+      transactionsUseCases.saveCredits(dataStringified)
+      break
+
+    default:
+      break
+  }
+})
 
 export class RoundController {
   constructor(
