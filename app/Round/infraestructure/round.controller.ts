@@ -190,6 +190,13 @@ export class RoundController {
     try {
       const { providerId, result } = request.body()
 
+      const phase = await this.roundControlRedisUseCases.getPhase(providerId)
+      if (phase !== 'wait_result')
+        return response.badRequest({
+          ok: false,
+          msg: 'Round opened',
+        })
+
       const rounds = await this.roundUseCases.findRoundsByProviderId(providerId)
 
       if (!rounds.length) return response.notFound({ msg: 'Rounds not founded' })

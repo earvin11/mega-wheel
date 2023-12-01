@@ -10,11 +10,11 @@ export interface TransactionEntity {
   typeTransaction: TypesTransaction
   amount: number
   amountExchangeDollar: number
-  currency: CurrencyEntity
+  currency?: CurrencyEntity
   userBalance: number
   currencyExchangeDollar: number
-  bet: BetEntity
-  player: PlayerEntity
+  bet?: BetEntity
+  player?: PlayerEntity
   round: any
   game: any
   usersOnline?: number

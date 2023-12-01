@@ -1,5 +1,9 @@
 // INTERFACES
-import { FilterReportInterface, RoundReportEnitity } from '../domain/reports.entity'
+import {
+  FilterReportInterface,
+  RoundReportEnitity,
+  TransactionReportInterface,
+} from '../domain/reports.entity'
 import { ReportsRepository } from '../domain/reports.repository'
 // import { CurrencyEntity } from '../../Currencies/domain/currency.entity'
 //USE CASES
@@ -9,6 +13,7 @@ import RoundModel from 'App/Round/infraestructure/round.model'
 // import OperatorModel from 'App/Operator/infrastructure/operator.model'
 //FUNCTIONS
 import { FormatDate } from 'App/Shared/Helpers/formate-date'
+import TransactionModel from 'App/Transaction/infrastructure/transactions.model'
 
 export class ReportsMongoRepository implements ReportsRepository {
   constructor(private operatorUseCases: OperatorUseCases) { }
@@ -117,5 +122,112 @@ export class ReportsMongoRepository implements ReportsRepository {
     ])
 
     return rounds
+  }
+
+  public getTransactions = async (
+    filterData: FilterReportInterface,
+  ): Promise<TransactionReportInterface[] | []> => {
+    const {
+      page = 1,
+      limit = 10,
+      game,
+      client,
+      operator,
+      identifierNumber,
+      startDate,
+      endDate,
+      currency,
+      player,
+      transactionId,
+      wl,
+    } = filterData
+
+    let filter: {
+      games?: string[]
+    } = {}
+
+    if (startDate && endDate) {
+      filter['createdAt'] = {
+        $lte: FormatDate(startDate, endDate).end_date,
+        $gte: FormatDate(startDate, endDate).start_date,
+      }
+    }
+
+    if (game) filter['game.uuid'] = game
+
+    if (identifierNumber) filter['round.identifierNumber'] = identifierNumber
+
+    if (client) filter['player.operator.client'] = client
+
+    if (operator) filter['player.operator.uuid'] = operator
+
+    if (currency) filter['currency.uuid'] = currency
+
+    if (player) filter['player.uuid'] = player
+
+    if (wl) filter['player.WL'] = wl
+
+    if (transactionId) filter['uuid'] = transactionId
+
+    const aggregate = [
+      {
+        $lookup: {
+          from: 'clients',
+          localField: 'player.operator.client',
+          foreignField: 'uuid',
+          as: 'clientPlayer',
+        },
+      },
+      {
+        $unwind: '$clientPlayer',
+      },
+      {
+        $project: {
+          'amount': 1,
+          'amountExchangeDollar': 1,
+          'currencyExchangeDollar': 1,
+          'createdAt': 1,
+          'platform': 1,
+          'playerIp': 1,
+          'playerCountry': 1,
+          'typeTransaction': 1,
+          'userAgent': 1,
+          'userBalance': 1,
+          'uuid': 1,
+          'bet.uuid': 1,
+          'currency.uuid': 1,
+          'currency.isoCode': 1,
+          'player.userId': 1,
+          'player.username': 1,
+          'player.WL': 1,
+          'player.currencyUuid': 1,
+          'player.operator.name': 1,
+          'player.operator.client': 1,
+          'round.identifierNumber': 1,
+          'round.result': 1,
+          'game.uuid': 1,
+          'game.name': 1,
+          'clientPlayer.name': 1,
+        },
+      },
+      {
+        $match: {
+          ...filter,
+        },
+      },
+    ]
+
+    const transactions = await TransactionModel.aggregate([
+      { $sort: { createdAt: -1 } },
+      ...aggregate,
+      {
+        $skip: (Number(page) - 1) * Number(limit),
+      },
+      {
+        $limit: Number(limit),
+      },
+    ])
+
+    return transactions
   }
 }

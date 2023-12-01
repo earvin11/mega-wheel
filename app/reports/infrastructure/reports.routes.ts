@@ -3,7 +3,7 @@ import { reportsController } from './dependencies'
 
 const ReportsRoutes = () => {
   Route.get('rounds', reportsController.getRounds).middleware(['pagination'])
-  // Route.get('transactions', reportsController.getTransactions).middleware(['pagination'])
+  Route.get('transactions', reportsController.getTransactions).middleware(['pagination'])
   // Route.get('bet/:uuid', reportsController.getBetInTransaction)
   // Route.get('currency-fluctuation', reportsController.getCurrencyFluctuation).middleware([
   //   'pagination',

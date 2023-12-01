@@ -9,10 +9,10 @@ export class ReportsUseCases {
     return rounds
   }
 
-  // public getTransactions = async (filter: FilterReportInterface) => {
-  //   const transactions = await this.reportRepository.getTransactions(filter)
-  //   return transactions
-  // }
+  public getTransactions = async (filter: FilterReportInterface) => {
+    const transactions = await this.reportRepository.getTransactions(filter)
+    return transactions
+  }
 
   // public getBetInTransaction = async (uuid: string, type: string) => {
   //   const bet = await this.reportRepository.getBetInTransaction(uuid, type)

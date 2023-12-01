@@ -1,3 +1,4 @@
+import { Transaction } from '../domain/transaction.value';
 import { TransactionEntity } from '../domain/transactions.entity';
 import { TransactionsRepository } from '../domain/transactions.repository'
 
@@ -6,7 +7,8 @@ export class TransactionsUseCases {
 
   public createTransaction = async (transaction: TransactionEntity) => {
     try {
-      this.transactionRepository.createTransaction(transaction)
+      const newTransaction = new Transaction(transaction)
+      this.transactionRepository.createTransaction(newTransaction)
     } catch (err) {
       throw err
     }

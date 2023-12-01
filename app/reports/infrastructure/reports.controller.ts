@@ -24,4 +24,23 @@ export class ReportsController {
       response.status(400).json({ error, message: 'Error getting rounds in reports' })
     }
   }
+
+  public getTransactions = async (ctx: HttpContext) => {
+    const { response, request } = ctx
+    const filter = request.qs()
+
+    try {
+      const transactions = await this.reportsUseCases.getTransactions(
+        filter as FilterReportInterface,
+      )
+
+      response.json({
+        message: 'Transactions obtained!',
+        transactions,
+      })
+    } catch (error) {
+      console.log('ERROR TRANSACTIONS -> REPORTS CONTROLLER', error)
+      response.status(400).json({ error, message: 'Error getting transactions in reports' })
+    }
+  }
 }

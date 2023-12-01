@@ -7,6 +7,7 @@ import { exchangeCurrencyByDollar } from 'App/Shared/Helpers/utils-functions'
 
 import { CurrencyUseCases } from 'App/Currencies/application/currencyUseCases'
 import { RoundUseCases } from 'App/Round/application/round.use-cases'
+import { Transaction } from '../domain/transaction.value'
 
 export class TransactionsMongoRepository implements TransactionsRepository {
   constructor(private roundUseCases: RoundUseCases, private currencyUseCases: CurrencyUseCases) { }
@@ -36,7 +37,7 @@ export class TransactionsMongoRepository implements TransactionsRepository {
 
       const currencyExchangeDollar = exchangeCurrencyByDollar(currency!)
 
-      this.createTransaction({
+      const transaction = new Transaction({
         amount: toWallet.amount,
         platform: 'desktop',
         playerCountry: 'ves',
@@ -53,6 +54,8 @@ export class TransactionsMongoRepository implements TransactionsRepository {
         currencyExchangeDollar,
         currency: currency!,
       })
+
+      this.createTransaction(transaction)
     }
   }
 }
