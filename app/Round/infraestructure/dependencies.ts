@@ -8,6 +8,7 @@ import { RoundBetUseCases } from '../../RoundBets/application/round-bet-use-case
 import { RoundBetMongoRepository } from '../../RoundBets/infraestructure/round-bet.repository'
 import { BetControlRedisUseCases } from 'App/Bet/application/bet-control.redis.use-cases'
 import { BetControlRedisRepository } from 'App/Bet/infraestructure/repositories/bet-control.redis-repository'
+import { currencyUseCases } from '../../Currencies/infrastructure/dependencies'
 
 export const roundControlRedisRepository = new RoundControlRedisRepository()
 export const roundControlRedisUseCases = new RoundControlRedisUseCases(roundControlRedisRepository)
@@ -23,5 +24,6 @@ export const roundController = new RoundController(
   roundControlRedisUseCases,
   wheelFortuneUseCases,
   roundBetUseCases,
-  betControlRedisUseCases
+  betControlRedisUseCases,
+  currencyUseCases
 )
