@@ -5,7 +5,6 @@ import RoundModel from '../../Round/infraestructure/round.model'
 import BetModel from '../../Bet/infraestructure/bet.model'
 import PlayerModel from '../../Player/infraestructure/player.model'
 // import CurrencyModel from "../../Currencies/infrastructure/currency.model";
-import { WheelFortuneEntity } from 'App/WheelFortune/domain/wheel-fortune.entity'
 import GameModel from '../../WheelFortune/infraestructure/wheelFortune.model'
 import { logUseCases } from '../../Log/infrastructure/dependencies'
 import { TypesLogsErrors } from '../../Log/domain/log.entity'
