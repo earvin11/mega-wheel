@@ -16,17 +16,10 @@ import { RoundBetUseCases } from 'App/RoundBets/application/round-bet-use-case'
 import { RoundBetEntity, RoundBetType } from 'App/RoundBets/domain/roundBet.entity'
 import { BetEntity } from 'App/Bet/domain'
 import { getRoundBet, useAnalisysPosible, useJackpot } from 'App/Shared/Helpers/wheel-utils'
-import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
 import { BetControlRedisUseCases } from 'App/Bet/application/bet-control.redis.use-cases'
 import { transactionsUseCases } from 'App/Transaction/infrastructure/dependencies'
-// import RoundBetModel from 'App/RoundBets/infraestructure/round-bets.model'
-// import BetModel from 'App/Bet/infraestructure/bet.model'
-// import CurrencyModel from 'App/Currencies/infrastructure/currency.model'
-// import {
-//   useAnalisysPosible,
-//   useJackpot,
-//   useJackpotRandom,
-// } from 'App/Shared/Helpers/wheel-utils'
+import { CurrencyUseCases } from 'App/Currencies/application/currencyUseCases'
+
 
 const worker = new Worker('./app/Shared/Services/Worker')
 
@@ -52,6 +45,7 @@ export class RoundController {
     private wheelUseCases: WheelFortuneUseCases,
     private roundBetUseCases: RoundBetUseCases,
     private betControlRedisUseCases: BetControlRedisUseCases,
+    private currencyUseCases: CurrencyUseCases
   ) { }
 
   private changePhase = async (table: string, phase: Phase, io: any, timeWait?: number) => {
@@ -115,7 +109,7 @@ export class RoundController {
       )
 
       await this.updateRoundRedis(roundsClosed)
-      const currencies = await CurrencyModel.find()
+      const currencies = await this.currencyUseCases.getAllCurrencies()
       const bets: BetEntity[] = []
       for (let i = 0; i < roundsClosed.length; i++) {
         const betsToPush = await this.betControlRedisUseCases.getBetsByRound(roundsClosed[i]?.uuid!)
