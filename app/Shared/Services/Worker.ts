@@ -1,16 +1,27 @@
 import { parentPort } from 'worker_threads'
-import { connect } from 'mongoose'
+import mongoose, { connect } from 'mongoose'
 import { payBetsWinnerWorker } from '../Helpers/functions-worker'
 
 const MONGO_URL = <string>process.env.MONGO_URI
 
-const connectDatabase = async () => {
+/* const connectDatabase = async () => {
   await connect(MONGO_URL)
 }
 
 connectDatabase()
   .then(() => console.log('DB IS CONNECT'))
-  .catch((error) => console.log(error))
+  .catch((error) => console.log(error)) */
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGO_URL as string, {})
+    console.log('Connected to database in worker')
+  } catch (error) {
+    console.log('error worker', error)
+    process.exit(1)
+  }
+}
+connectDB()
 
 parentPort?.on('message', async (data) => {
   const { cmd } = data
