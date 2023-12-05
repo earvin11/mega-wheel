@@ -31,8 +31,15 @@ export class WheelFortuneMongoRepository implements WheelFortuneRepository {
     uuid: string,
     updateWheelDto: UpdateWheelDto,
   ): Promise<WheelFortuneEntity | null> => {
-    throw new Error('Method not implemented.')
+    try {
+      const wheelDeleted = await GameModel.findOneAndUpdate({ uuid }, updateWheelDto, { new: true })
+      if (!wheelDeleted) return null
+      return wheelDeleted
+    } catch (error) {
+      throw error
+    }
   }
+
   public deleteByUuid = async (uuid: string): Promise<WheelFortuneEntity | null> => {
     try {
       const wheelDeleted = await GameModel.findOneAndUpdate(

@@ -8,7 +8,7 @@ const WheelSchema = new Schema<WheelFortuneEntity>(
     betTime: { type: Number, default: 10 },
     colorBackground: String,
     croupier: String,
-    imgBackgrout: String,
+    imgBackground: String,
     jackpot: { type: Boolean, default: false },
     language: String,
     logo: String,
