@@ -203,6 +203,7 @@ export class ReportsMongoRepository implements ReportsRepository {
           'player.currencyUuid': 1,
           'player.operator.name': 1,
           'player.operator.client': 1,
+          'player.operator.uuid': 1,
           'round.identifierNumber': 1,
           'round.result': 1,
           'game.uuid': 1,

@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { LogEntity } from 'App/Log/domain/log.entity'
+import { LogEntity, TypesLogsErrors } from 'App/Log/domain/log.entity'
 import { Log } from 'App/Log/domain/log.value'
 import LogModel from '../../app/Log/infrastructure/log.model'
 import { UserRegisterEntity } from 'App/Authentication/domain/register.entity'
@@ -14,6 +14,7 @@ test.group('Log: Get all logs', (group) => {
     player: 'test player',
     request: 'request test',
     response: 'response test',
+    typeError: TypesLogsErrors.debit,
   }
 
   const newLog = new Log(log)
