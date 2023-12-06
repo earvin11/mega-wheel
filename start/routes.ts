@@ -38,8 +38,7 @@ import WheelRoutes from 'App/WheelFortune/infraestructure/wheelFortune.routes'
 import RoundRoutes from 'App/Round/infraestructure/round.routes'
 import BetRoutes from 'App/Bet/infraestructure/bet.routes'
 import LaunchRoutes from 'App/Launch/infraestructure/launch.routes'
-import ReportsRoutes from 'App/reports/infrastructure/reports.routes'
-// import ReportsRoutes from 'App/Reports/infrastructure/reports.routes'
+import ReportsRoutes from 'App/Reports/infrastructure/reports.routes'
 
 Route.group(AuthenticationRoutes).prefix('auth')
 Route.group(AuditoriesRoutes).prefix('auditories')
