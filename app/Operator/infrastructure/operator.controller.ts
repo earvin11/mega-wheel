@@ -7,7 +7,7 @@ import { OperatorUrlEntity } from '../domain/entities/operatorUrl.entity'
 import { UpdateOperatorEntity } from '../domain/entities/updateOperator.entity'
 import { CurrencyUseCases } from '../../Currencies/application/currencyUseCases'
 import { ClientUseCases } from '../../Client/application/ClientUseCases'
-import { CurrencyAndLimitsEntity } from '../domain/entities'
+import { CurrencyAndLimitsEntity, OperatorGameLimitsEntity } from '../domain/entities'
 import { WheelFortuneUseCases } from '../../WheelFortune/apllication/wheel-fortune.use-cases'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 
@@ -488,7 +488,8 @@ export class OperatorController {
   public getGamesByCurrency = async ({ request, response }: HttpContextContract) => {
     const { uuid, currency } = request.params();
     try {
-      const resp = await this.operatorUseCases.getGamesByCurrencyInOperator(uuid, currency);
+      const data = await this.operatorUseCases.getGamesByCurrencyInOperator(uuid, currency);
+      const resp = await this.parseResponseGamesByCurrency(data, currency);
       response.ok(resp);
     } catch (error) {
       console.log('ERROR GET GAMES BY CURRENCY ->', error);
@@ -507,5 +508,28 @@ export class OperatorController {
       console.log('ERROR GET GAMES ->', error)
       response.internalServerError({ error: 'ERROR GET GAMES OPERATOR' })
     }
+  }
+
+  private parseResponseGamesByCurrency = (data: OperatorGameLimitsEntity[], currencyIsoCode: string): Promise<any> => {
+    return new Promise((resolve) => {
+      const resp = data.map((opLimit) => {
+        const { game, currencyAndLimits } = opLimit;
+        const currency = currencyAndLimits.find(curr => (curr.currency.isoCode === currencyIsoCode));
+        return {
+          game,
+          limits: {
+            minBet: currency?.minBet,
+            maxBet: currency?.maxBet
+          },
+          currency: {
+            isoCode: currency?.currency.isoCode,
+            name: currency?.currency.name,
+            uuid: currency?.currency.uuid
+          },
+        }
+      })
+
+      resolve(resp);
+    });
   }
 }
