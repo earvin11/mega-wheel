@@ -1,4 +1,10 @@
-import { OperatorEntity, OperatorGameLimitsEntity, UpdateOperatorEntity, OperatorUrlEntity, ConfigPaymentEntity } from '../domain/entities'
+import {
+  OperatorEntity,
+  OperatorGameLimitsEntity,
+  UpdateOperatorEntity,
+  OperatorUrlEntity,
+  ConfigPaymentEntity,
+} from '../domain/entities'
 import { OperatorRepository } from '../domain/operator.repository'
 import OperatorModel from './operator.model'
 // import { defualtChipsToSave } from '../../Shared/Values/default-chips'
@@ -8,9 +14,8 @@ import OperatorModel from './operator.model'
 import { Operator } from '../domain/implementations'
 
 export class OperatorMongoRepository implements OperatorRepository {
-  constructor(
-    // private chipUseCases: ChipUseCases
-  ) {}
+  constructor() // private chipUseCases: ChipUseCases
+  { }
   public createOperator = async (operator: OperatorEntity): Promise<OperatorEntity> => {
     const operatorCreated = await OperatorModel.create(operator)
     return operatorCreated
@@ -147,59 +152,59 @@ export class OperatorMongoRepository implements OperatorRepository {
   //   uuid: string,
   //   isoCode: string,
   // ): Promise<OperatorEntity | null> => {
-    // const chipsOperator = await this.showOperatorChips(uuid)
+  // const chipsOperator = await this.showOperatorChips(uuid)
 
-    // const chipsData = await this.chipUseCases.getManyChips(chipsOperator?.chips as string[])
+  // const chipsData = await this.chipUseCases.getManyChips(chipsOperator?.chips as string[])
 
-    // const chipsToRemove = chipsData.filter((ch) => ch.currency !== isoCode).map((ch) => ch.uuid)
+  // const chipsToRemove = chipsData.filter((ch) => ch.currency !== isoCode).map((ch) => ch.uuid)
 
-    // const removeChipsInOperator = await OperatorModel.findOneAndUpdate(
-    //   { uuid },
-    //   {
-    //     chips: chipsToRemove,
-    //   },
-    //   { new: true },
-    // )
+  // const removeChipsInOperator = await OperatorModel.findOneAndUpdate(
+  //   { uuid },
+  //   {
+  //     chips: chipsToRemove,
+  //   },
+  //   { new: true },
+  // )
 
-    // if (!removeChipsInOperator) return null
+  // if (!removeChipsInOperator) return null
 
-    // const deletedChips = await ChipModel.deleteMany({ currency: isoCode, operator: uuid })
+  // const deletedChips = await ChipModel.deleteMany({ currency: isoCode, operator: uuid })
 
-    // if (!deletedChips) return null
+  // if (!deletedChips) return null
 
-    // let data: any
-    // data = defualtChipsToSave[isoCode]
-    // if (!data) data = defualtChipsToSave['default']
+  // let data: any
+  // data = defualtChipsToSave[isoCode]
+  // if (!data) data = defualtChipsToSave['default']
 
-    // const promisesChips = data.map(async (data: any) => {
-    //   const chips = {
-    //     currency: isoCode,
-    //     operator: uuid,
-    //     ...data,
-    //   }
-    //   const chip = await this.chipUseCases.createChip(chips)
-    //   return chip
-    // })
+  // const promisesChips = data.map(async (data: any) => {
+  //   const chips = {
+  //     currency: isoCode,
+  //     operator: uuid,
+  //     ...data,
+  //   }
+  //   const chip = await this.chipUseCases.createChip(chips)
+  //   return chip
+  // })
 
-    // const chips = await Promise.all([...promisesChips])
+  // const chips = await Promise.all([...promisesChips])
 
-    // const ids = chips.map((ch) => ch.uuid)
+  // const ids = chips.map((ch) => ch.uuid)
 
-    // const operator = await OperatorModel.findOneAndUpdate(
-    //   {
-    //     uuid,
-    //   },
-    //   {
-    //     $push: { chips: { $each: ids } },
-    //   },
-    //   {
-    //     new: true,
-    //   },
-    // )
+  // const operator = await OperatorModel.findOneAndUpdate(
+  //   {
+  //     uuid,
+  //   },
+  //   {
+  //     $push: { chips: { $each: ids } },
+  //   },
+  //   {
+  //     new: true,
+  //   },
+  // )
 
-    // if (!operator) return null
+  // if (!operator) return null
 
-    // return operator
+  // return operator
   //}
 
   // CURRENCIES
@@ -233,93 +238,128 @@ export class OperatorMongoRepository implements OperatorRepository {
   }
 
   // GAMES AND LIMITS
-  public addGameLimitsInOperator = async (uuid: string, dataGameLimit: OperatorGameLimitsEntity): Promise<OperatorEntity | null> => {
+  public addGameLimitsInOperator = async (
+    uuid: string,
+    dataGameLimit: OperatorGameLimitsEntity,
+  ): Promise<OperatorEntity | null> => {
     try {
-      const operator = await this.getOperatorByUuid(uuid);
+      const operator = await this.getOperatorByUuid(uuid)
       if (!operator) return null
 
-      const operatorUpdate = new Operator(operator);
-      const data = operatorUpdate.addOperatorGamesLimits(dataGameLimit);
+      const operatorUpdate = new Operator(operator)
+      const data = operatorUpdate.addOperatorGamesLimits(dataGameLimit)
 
-      await OperatorModel.updateOne({uuid}, { operatorGamesLimits: data });
-      return operator;
+      await OperatorModel.updateOne({ uuid }, { operatorGamesLimits: data })
+      return operator
     } catch (error) {
-      throw error;
+      throw error
     }
   }
-  public getAllGamesLimitsInOperator = async (uuid: string): Promise<OperatorGameLimitsEntity[] | []> => {
+  public getAllGamesLimitsInOperator = async (
+    uuid: string,
+  ): Promise<OperatorGameLimitsEntity[] | []> => {
     try {
-      const operator = await this.getOperatorByUuid(uuid);
-      if(!operator) return [];
-      if(!operator.operatorGamesLimits) return [];
-      return operator.operatorGamesLimits;
+      const operator = await this.getOperatorByUuid(uuid)
+      if (!operator) return []
+      if (!operator.operatorGamesLimits) return []
+      return operator.operatorGamesLimits
     } catch (error) {
-      throw error;
+      throw error
     }
   }
-  public getGameAndLimitsInOperator = async ({ uuid, operator, gameUuid }: { uuid?: string; operator?: OperatorEntity; gameUuid: string }): Promise<OperatorGameLimitsEntity | null> => {
-    
-    let operatorData: OperatorEntity | null = null;
-    if(operator) {
+  public getGameAndLimitsInOperator = async ({
+    uuid,
+    operator,
+    gameUuid,
+  }: {
+    uuid?: string
+    operator?: OperatorEntity
+    gameUuid: string
+  }): Promise<OperatorGameLimitsEntity | null> => {
+    let operatorData: OperatorEntity | null = null
+    if (operator) {
       operatorData = operator
-    };
+    }
 
     try {
-      if(!operatorData && uuid) {
+      if (!operatorData && uuid) {
         operatorData = await this.getOperatorByUuid(uuid)
       }
-      if(!operatorData) return null;
+      if (!operatorData) return null
 
-      const gameAndLimit = operatorData.operatorGamesLimits?.find( gameLimit => ( gameLimit.game.uuid === gameUuid ));
-      if(!gameAndLimit) return null;
+      const gameAndLimit = operatorData.operatorGamesLimits?.find(
+        (gameLimit) => gameLimit.game.uuid === gameUuid,
+      )
+      if (!gameAndLimit) return null
 
-      return gameAndLimit;
+      return gameAndLimit
     } catch (error) {
-      throw error;
+      throw error
     }
   }
-  public deleteGameAndLimitsInOperator = (uuid: string, gameUuid: string): Promise<OperatorEntity | null> => {
-    throw new Error('Method not implemented');
+  public deleteGameAndLimitsInOperator = (
+    uuid: string,
+    gameUuid: string,
+  ): Promise<OperatorEntity | null> => {
+    throw new Error('Method not implemented')
   }
   //CONFIG PAYMENT
   public addConfigPaymentInGame = async (
     uuid: string,
     gameUuid: string,
-    configPayment: ConfigPaymentEntity[]
+    configPayment: ConfigPaymentEntity[],
   ): Promise<OperatorEntity | null> => {
     try {
-      const operator = await this.getOperatorByUuid(uuid);
-      if(!operator) return null;
+      const operator = await this.getOperatorByUuid(uuid)
+      if (!operator) return null
 
-      const operatorUpdate = new Operator(operator);
+      const operatorUpdate = new Operator(operator)
 
-      const data = operatorUpdate.addConfigPaymentByGame(gameUuid, configPayment);
-      if(!data) return null;
+      const data = operatorUpdate.addConfigPaymentByGame(gameUuid, configPayment)
+      if (!data) return null
 
-      await OperatorModel.updateOne({uuid}, { operatorGamesLimits: data });
-      return operator;
+      await OperatorModel.updateOne({ uuid }, { operatorGamesLimits: data })
+      return operator
     } catch (error) {
-      throw error;
-    }  
+      throw error
+    }
   }
 
-  public getGamesByCurrencyInOperator = async (uuid: string, isoCode: string): Promise<OperatorGameLimitsEntity[] | []> => {
+  public getGamesByCurrencyInOperator = async (
+    uuid: string,
+    isoCode: string,
+  ): Promise<OperatorGameLimitsEntity[] | []> => {
     try {
-      const operator = await this.getOperatorByUuid(uuid);
-      if(!operator?.operatorGamesLimits) return [];
+      const operator = await this.getOperatorByUuid(uuid)
+      if (!operator?.operatorGamesLimits) return []
 
-      const data: OperatorGameLimitsEntity[] = [];
-      
-      operator.operatorGamesLimits.forEach( gameLimit =>{
-        gameLimit.currencyAndLimits.forEach( cl => {
+      const data: OperatorGameLimitsEntity[] = []
+
+      operator.operatorGamesLimits.forEach((gameLimit) => {
+        gameLimit.currencyAndLimits.forEach((cl) => {
           if (cl.currency.isoCode === isoCode) {
             data.push(gameLimit)
-          };
-        });
+          }
+        })
       })
-      return data;
+      return data
     } catch (error) {
-      throw error;
+      throw error
+    }
+  }
+
+  public getGames = async (uuid: string): Promise<OperatorGameLimitsEntity[] | []> => {
+    try {
+      const operator = await this.getOperatorByUuid(uuid)
+      if (!operator) return []
+      const gamesLimits = operator?.operatorGamesLimits
+      if (!gamesLimits?.length) return []
+
+      const wheels = gamesLimits.filter((item) => item.game.type === 'WHEEL')
+      if (!wheels.length) return []
+      return wheels
+    } catch (error) {
+      throw error
     }
   }
 }

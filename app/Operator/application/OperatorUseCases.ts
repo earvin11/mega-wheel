@@ -9,7 +9,7 @@ import {
 import { Operator, OperatorGameLimits } from '../domain/implementations'
 
 export class OperatorUseCases {
-  constructor(private readonly operatorRepository: OperatorRepository) {}
+  constructor(private readonly operatorRepository: OperatorRepository) { }
 
   public createOperator = async (operator: OperatorEntity) => {
     const newOperator = new Operator(operator)
@@ -167,6 +167,17 @@ export class OperatorUseCases {
   ): Promise<OperatorGameLimitsEntity[] | []> => {
     try {
       const games = await this.operatorRepository.getGamesByCurrencyInOperator(uuid, isoCode)
+      return games
+    } catch (error) {
+      throw error
+    }
+  }
+
+  public getGames = async (
+    uuid: string,
+  ): Promise<OperatorGameLimitsEntity[] | []> => {
+    try {
+      const games = await this.operatorRepository.getGames(uuid)
       return games
     } catch (error) {
       throw error

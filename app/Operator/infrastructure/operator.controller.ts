@@ -17,7 +17,7 @@ export class OperatorController {
     private clientUseCases: ClientUseCases,
     private gameUseCases: WheelFortuneUseCases,
     private currencyUseCases: CurrencyUseCases,
-  ) {}
+  ) { }
 
   public createOperator = async (ctx: HttpContext) => {
     const { request, response } = ctx
@@ -493,6 +493,19 @@ export class OperatorController {
     } catch (error) {
       console.log('ERROR GET GAMES BY CURRENCY ->', error);
       response.internalServerError({ error: 'Error lobby' })
+    }
+  }
+
+  public getGames = async ({ request, response }: HttpContextContract) => {
+    const { uuid } = request.params()
+
+    try {
+      const wheels = await this.operatorUseCases.getGames(uuid)
+
+      response.ok({ msg: 'Operator games', wheels })
+    } catch (error) {
+      console.log('ERROR GET GAMES ->', error)
+      response.internalServerError({ error: 'ERROR GET GAMES OPERATOR' })
     }
   }
 }
